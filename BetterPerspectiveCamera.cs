@@ -436,12 +436,11 @@ namespace BetterPerspective
         IEnumerator Wait(float waitTimeDelete)
         {
             yield return new WaitForSeconds(waitTimeDelete);
-            foreach(CameraController CC in Camera.main.transform.GetComponents<CameraController>())
+            foreach(PerspectiveCamera CC in Camera.main.transform.GetComponents<PerspectiveCamera>())
             {
-                if (CC != this)
-                {
+                
                     CC.enabled = false;
-                }
+                
 
             }
         }
