@@ -138,6 +138,17 @@ namespace BetterPerspective
 
         protected void Update()
         {
+            if (Input.GetMouseButton(2) || Input.GetKey(KeyCode.LeftControl))
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                
+            }
+            else
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
             if (Time.timeScale > .2f)
             {
                 MoveDampening = 7f / Time.timeScale;
