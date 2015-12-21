@@ -73,7 +73,7 @@ namespace BetterPerspective
 
         protected void Start()
         {
-            Reset();
+            
             _rtsCamera = gameObject.GetComponent<BetterPerspectiveCamera>();
         }
 
