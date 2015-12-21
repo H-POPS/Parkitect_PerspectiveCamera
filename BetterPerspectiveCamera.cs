@@ -71,23 +71,21 @@ namespace BetterPerspective
         private BetterPerspectiveCameraKeys KeysScript;
         private BetterPerspectiveCameraMouse MouseScript;
         public Camera camera;
-
-
+        
 
         public void Reset()
         {
             
-            camera = GetComponent<Camera>();
-            camera.gameObject.AddComponent<>
-            KeysScript = GetComponent<BetterPerspectiveCameraKeys>();
-            MouseScript = GetComponent<BetterPerspectiveCameraMouse>();
+            
+            
+            
             Smoothing = true;
             Smoothness = 7f;
             
             _lastDebugCamera = true;
             LookAtHeightOffset = 1f;
-            TerrainHeightViaPhysics = false;
-            TerrainPhysicsLayerMask = ~0;
+            TerrainHeightViaPhysics = true;
+            TerrainPhysicsLayerMask = 1 << 12;
             GetTerrainHeight = null;
 
             TargetVisbilityViaPhysics = false;
@@ -120,9 +118,25 @@ namespace BetterPerspective
         protected void Start()
         {
 
-            StartCoroutine(Wait(2F));
+            KeysScript = GetComponent<BetterPerspectiveCameraKeys>();
+            MouseScript = GetComponent<BetterPerspectiveCameraMouse>();
+            camera = GetComponent<Camera>();
 
-            Reset();
+            StartCoroutine(Wait(2F));
+            if (!PlayerPrefs.HasKey("Smooth"))
+            {
+                Reset();
+                KeysScript.Reset();
+                MouseScript.Reset();
+            }
+            else
+            {
+                Reset();
+                KeysScript.Reset();
+                MouseScript.Reset();
+                Load();
+            }
+            
             if (GetComponent<Rigidbody>())
             {
 
@@ -170,7 +184,7 @@ namespace BetterPerspective
                 Follow(lockedOnto, false);
             }
 
-
+           
 
             if (_lastDebugCamera != ShowDebugCameraTarget)
             {
@@ -324,7 +338,7 @@ namespace BetterPerspective
                 }
             }
         }
-        public Rect windowRect = new Rect(5, 70, 250, 500);
+        public Rect windowRect = new Rect(5, 70, 250, 400);
         void OnGUI()
         {
             windowRect = GUI.Window(0, windowRect, DoMyWindow, "Camera Settings");
@@ -334,33 +348,82 @@ namespace BetterPerspective
         {
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
             Smoothing = GUILayout.Toggle(Smoothing, "Smooth");
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Smoothness:");
             Smoothness = GUILayout.HorizontalSlider(Smoothness, 10.0F, 1f);
             GUILayout.EndHorizontal();
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Move Speed:");
             KeysScript.MoveSpeedVar = GUILayout.HorizontalSlider(KeysScript.MoveSpeedVar, 1.0F, 40.0f);
             GUILayout.EndHorizontal();
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Rotate Speed:");
             MouseScript.RotateSpeedVar = GUILayout.HorizontalSlider(MouseScript.RotateSpeedVar, 150F, 570F);
             KeysScript.RotateSpeedVar = MouseScript.RotateSpeedVar - 100f;
             GUILayout.EndHorizontal();
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Zoom Speed:");
             MouseScript.ZoomSpeedVar = GUILayout.HorizontalSlider(MouseScript.ZoomSpeedVar, 1f, 30f);
             KeysScript.ZoomSpeedVar = MouseScript.ZoomSpeedVar;
             GUILayout.EndHorizontal();
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Drawing distance:");
-            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 50f, 500f);
+            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 20f, 300f);
             RenderSettings.fogEndDistance = camera.farClipPlane;
             RenderSettings.fogStartDistance = camera.farClipPlane - 10f;
             GUILayout.EndHorizontal();
+            string[] names = QualitySettings.names;
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginVertical();
+            GUILayout.Label("Quality Settings:");
+            int i = 0;
+            while (i < names.Length)
+            {
+                if (GUILayout.Button(names[i]))
+                    QualitySettings.SetQualityLevel(i, true);
+
+                i++;
+            }
+            GUILayout.EndVertical();
+
+            GUILayout.FlexibleSpace();
+            if(GUILayout.Button("Default Settings"))
+            {
+                Reset();
+                KeysScript.Reset();
+                MouseScript.Reset();
+            }
+            
 
         }
-
+        void OnDisable()
+        {
+            Save();
+        }
+        void Save()
+        {
+            PlayerPrefs.SetInt("Smooth", Convert.ToInt32(Smoothing));
+            PlayerPrefs.SetFloat("Smoothness", Smoothness);
+            PlayerPrefs.SetFloat("MoveSpeedVar", KeysScript.MoveSpeedVar);
+            PlayerPrefs.SetFloat("RotateSpeedVar", MouseScript.RotateSpeedVar);
+            PlayerPrefs.SetFloat("ZoomSpeedVar", MouseScript.ZoomSpeedVar);
+            PlayerPrefs.SetFloat("farClipPlane", camera.farClipPlane);
+        }
+        void Load()
+        {
+            Smoothing = Convert.ToBoolean(PlayerPrefs.GetInt("Smooth"));
+            Smoothness = PlayerPrefs.GetFloat("Smoothness");
+            KeysScript.MoveSpeedVar = PlayerPrefs.GetFloat("MoveSpeedVar");
+            MouseScript.RotateSpeedVar = PlayerPrefs.GetFloat("RotateSpeedVar");
+            MouseScript.ZoomSpeedVar = PlayerPrefs.GetFloat("ZoomSpeedVar");
+            camera.farClipPlane = PlayerPrefs.GetFloat("farClipPlane");
+        }
         public void Follow(GameObject followTarget, bool snap)
         {
             
