@@ -14,15 +14,19 @@ namespace BetterPerspective
 
         public bool AllowPan;
         public bool PanBreaksFollow;
+        public float PanSpeedVar;
         public float PanSpeed;
 
         public bool AllowRotate;
+        public float RotateSpeedVar;
         public float RotateSpeed;
 
         public bool AllowTilt;
+        public float TiltSpeedVar;
         public float TiltSpeed;
 
         public bool AllowZoom;
+        public float ZoomSpeedVar;
         public float ZoomSpeed;
 
         public string RotateInputAxis = "Mouse X";
@@ -48,18 +52,19 @@ namespace BetterPerspective
 
             AllowPan = true;
             PanBreaksFollow = true;
-            PanSpeed = 50f;
+            PanSpeedVar = 50f;
             PanKey1 = KeyCode.LeftShift;
             PanKey2 = KeyCode.RightShift;
 
             AllowRotate = true;
-            RotateSpeed = 360f;
+            RotateSpeedVar = 360f;
 
             AllowTilt = true;
-            TiltSpeed = 200f;
+            TiltSpeedVar = 200f;
 
             AllowZoom = true;
-            ZoomSpeed = 20f;
+            
+            ZoomSpeedVar = 10f;
 
             RotateInputAxis = "Mouse X";
             TiltInputAxis = "Mouse Y";
@@ -77,9 +82,9 @@ namespace BetterPerspective
             if (Time.timeScale > .2f)
             {
                 MoveSpeed = 20f / Time.timeScale;
-                RotateSpeed = 360f / Time.timeScale;
-                ZoomSpeed = 15f / Time.timeScale;
-                TiltSpeed = 200f / Time.timeScale;
+                RotateSpeed = RotateSpeedVar / Time.timeScale;
+                ZoomSpeed = ZoomSpeedVar / Time.timeScale;
+                TiltSpeed = TiltSpeedVar / Time.timeScale;
             }
 
             if (_rtsCamera == null)
