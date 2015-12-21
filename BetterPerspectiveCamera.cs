@@ -8,7 +8,7 @@ namespace BetterPerspective
 {
     public class BetterPerspectiveCamera : CameraController
     {
-
+        public bool ShowSettings = true;
         public Vector3 LookAt;
         public float Distance;
         public float Rotation;
@@ -160,6 +160,10 @@ namespace BetterPerspective
 
         protected void Update()
         {
+            if(Input.GetKeyUp(KeyCode.P))
+            {
+                ShowSettings = !ShowSettings;
+            }
             if (Input.GetMouseButton(2) || Input.GetKey(KeyCode.LeftControl))
             {
                 Cursor.visible = false;
@@ -341,7 +345,10 @@ namespace BetterPerspective
         public Rect windowRect = new Rect(5, 70, 250, 400);
         void OnGUI()
         {
-            windowRect = GUI.Window(0, windowRect, DoMyWindow, "Camera Settings");
+            if (ShowSettings)
+            {
+                windowRect = GUI.Window(0, windowRect, DoMyWindow, "Camera Settings");
+            }
         }
 
         void DoMyWindow(int windowID)
@@ -399,7 +406,7 @@ namespace BetterPerspective
                 KeysScript.Reset();
                 MouseScript.Reset();
             }
-            
+            GUILayout.Label("Press P to Toggle this window");
 
         }
         void OnDisable()
