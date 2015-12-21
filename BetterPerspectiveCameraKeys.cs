@@ -8,7 +8,7 @@ namespace BetterPerspective
     {
         public bool AllowMove;
         public float MoveSpeed;
-
+        public float MoveSpeedVar;
         public bool AllowFastMove;
         public float FastMoveSpeed;
         public KeyCode FastMoveKeyCode1;
@@ -16,9 +16,11 @@ namespace BetterPerspective
 
         public bool AllowRotate;
         public float RotateSpeed;
+        public float RotateSpeedVar;
 
         public bool AllowZoom;
         public float ZoomSpeed;
+        public float ZoomSpeedVar;
 
         public bool AllowTilt;
         public float TiltSpeed;
@@ -55,7 +57,8 @@ namespace BetterPerspective
         public void Reset()
         {
             AllowMove = true;
-            MoveSpeed = 20f;
+            MoveSpeedVar = 15f;
+            MoveSpeed = MoveSpeedVar;
 
             AllowFastMove = true;
             FastMoveSpeed = 40f;
@@ -63,16 +66,16 @@ namespace BetterPerspective
             FastMoveKeyCode2 = KeyCode.RightShift;
 
             AllowRotate = true;
-            RotateSpeed = 180f;
+            RotateSpeedVar = 180f;
 
             AllowZoom = true;
-            ZoomSpeed = 15f;
+            ZoomSpeedVar = 15f;
 
             AllowTilt = true;
             TiltSpeed = 90f;
 
-            ResetKey = KeyCode.C;
-            IncludePositionOnReset = false;
+            ResetKey = KeyCode.Return;
+            IncludePositionOnReset = true;
 
             MovementBreaksFollow = true;
         }
@@ -82,15 +85,15 @@ namespace BetterPerspective
             Reset();
             _rtsCamera = gameObject.GetComponent<BetterPerspectiveCamera>();
         }
-
+        
         protected void Update()
         {
             if (Time.timeScale > .2f)
             {
-                FastMoveSpeed = 40f / Time.timeScale;
-                MoveSpeed = 20f / Time.timeScale;
-                RotateSpeed = 180f / Time.timeScale;
-                ZoomSpeed = 15f / Time.timeScale;
+                FastMoveSpeed = MoveSpeedVar * 2 / Time.timeScale;
+                MoveSpeed = MoveSpeedVar / Time.timeScale;
+                RotateSpeed = RotateSpeedVar / Time.timeScale;
+                ZoomSpeed = ZoomSpeedVar / Time.timeScale;
                 TiltSpeed = 90f / Time.timeScale;
             }
             if (_rtsCamera == null)

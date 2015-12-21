@@ -51,6 +51,7 @@
     <Content Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DepthOfFieldScatter.shader" />
     <None Include="mod.json" />
     <None Include="README.md" />
   </ItemGroup>
