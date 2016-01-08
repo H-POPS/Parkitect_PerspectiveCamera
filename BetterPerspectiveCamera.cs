@@ -110,6 +110,7 @@ namespace BetterPerspective
             MaxTilt = 85f;
             TiltDampening = 5f;
 
+
             FollowBehind = false;
             FollowRotationOffset = 0;
             

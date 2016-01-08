@@ -41,6 +41,7 @@ namespace BetterPerspective
             cam.transparencySortMode = cam2.transparencySortMode;
             cam.useOcclusionCulling = cam2.useOcclusionCulling;
             
+
             Object.DestroyImmediate(cam.gameObject.GetComponent<CameraController>());
             Camera.main.gameObject.AddComponent<BetterPerspectiveCamera>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraKeys>();
