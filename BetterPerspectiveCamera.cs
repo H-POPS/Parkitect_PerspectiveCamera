@@ -135,7 +135,6 @@ namespace BetterPerspective
                 KeysScript.Reset();
                 MouseScript.Reset();
                 Load();
-                ShowSettings = false;
             }
             
             if (GetComponent<Rigidbody>())

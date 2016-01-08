@@ -60,9 +60,8 @@ namespace BetterPerspective
 
         public string Name { get { return "BetterPerspective"; } }
         public string Description { get { return "Better Perspective camera"; } }
-        public string Identifier { get; set; }
 
-
+        
     }
     
 }
