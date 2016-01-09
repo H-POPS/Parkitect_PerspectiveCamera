@@ -135,6 +135,7 @@ namespace BetterPerspective
                 Reset();
                 KeysScript.Reset();
                 MouseScript.Reset();
+                ShowSettings = false;
                 Load();
             }
             
