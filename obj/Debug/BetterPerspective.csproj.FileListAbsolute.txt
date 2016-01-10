@@ -34,3 +34,17 @@ D:\Downloads\Parkitect Pre-Alpha 5 - Windows\pnmods\BetterPerspective\bin\Debug\
 D:\Downloads\Parkitect Pre-Alpha 5 - Windows\pnmods\BetterPerspective\obj\Debug\BetterPerspective.csprojResolveAssemblyReference.cache
 D:\Downloads\Parkitect Pre-Alpha 5 - Windows\pnmods\BetterPerspective\obj\Debug\ClassLibrary.dll
 D:\Downloads\Parkitect Pre-Alpha 5 - Windows\pnmods\BetterPerspective\obj\Debug\ClassLibrary.pdb
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\ClassLibrary.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\ClassLibrary.pdb
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\Fabric.Core.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\DOTween.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\ProMouseDll.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\protobuf-net.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\UnityEngine.CrashLog.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\MouseLibWin.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\bin\Debug\UnityEngine.xml
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\obj\Debug\BetterPerspective.csprojResolveAssemblyReference.cache
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\obj\Debug\ClassLibrary.dll
+C:\Users\Henrico\Documents\Parkitect\pnmods\BetterPerspective\obj\Debug\ClassLibrary.pdb

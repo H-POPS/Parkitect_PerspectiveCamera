@@ -74,7 +74,7 @@ namespace BetterPerspective
             AllowTilt = true;
             TiltSpeed = 90f;
 
-            ResetKey = KeyCode.Return;
+            ResetKey = KeyCode.Home;
             IncludePositionOnReset = true;
 
             MovementBreaksFollow = true;
@@ -88,14 +88,14 @@ namespace BetterPerspective
         
         protected void Update()
         {
-            if (Time.timeScale > .2f)
-            {
-                FastMoveSpeed = MoveSpeedVar * 2 / Time.timeScale;
-                MoveSpeed = MoveSpeedVar / Time.timeScale;
-                RotateSpeed = RotateSpeedVar / Time.timeScale;
-                ZoomSpeed = ZoomSpeedVar / Time.timeScale;
-                TiltSpeed = 90f / Time.timeScale;
-            }
+            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+           
+                FastMoveSpeed = MoveSpeedVar * 2;
+                MoveSpeed = MoveSpeedVar;
+                RotateSpeed = RotateSpeedVar;
+                ZoomSpeed = ZoomSpeedVar;
+                TiltSpeed = 90f;
+            
             if (_rtsCamera == null)
                 return; // no camera, bail!
 
@@ -113,14 +113,14 @@ namespace BetterPerspective
                 if (Mathf.Abs(h) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(h * speed * Time.deltaTime, 0, 0);
+                    _rtsCamera.AddToPosition(h * speed * num, 0, 0);
                 }
 
                 var v = Input.GetAxisRaw(VerticalInputAxis);
                 if (Mathf.Abs(v) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, v * speed * Time.deltaTime);
+                    _rtsCamera.AddToPosition(0, 0, v * speed * num);
                 }
 
                 if (hasMovement && _rtsCamera.IsFollowing && MovementBreaksFollow)
@@ -136,18 +136,18 @@ namespace BetterPerspective
                     var rot = Input.GetAxisRaw(RotateInputAxis);
                     if (Mathf.Abs(rot) > 0.001f)
                     {
-                        _rtsCamera.Rotation += rot * RotateSpeed * Time.deltaTime;
+                        _rtsCamera.Rotation += rot * RotateSpeed * num;
                     }
                 }
                 else
                 {
                     if (Input.GetKey(RotateLeftKey))
                     {
-                        _rtsCamera.Rotation += RotateSpeed * Time.deltaTime;
+                        _rtsCamera.Rotation += RotateSpeed * num;
                     }
                     if (Input.GetKey(RotateRightKey))
                     {
-                        _rtsCamera.Rotation -= RotateSpeed * Time.deltaTime;
+                        _rtsCamera.Rotation -= RotateSpeed * num;
                     }
                 }
             }
@@ -159,18 +159,18 @@ namespace BetterPerspective
                     var zoom = Input.GetAxisRaw(ZoomInputAxis);
                     if (Mathf.Abs(zoom) > 0.001f)
                     {
-                        _rtsCamera.Distance += zoom * ZoomSpeed * Time.deltaTime;
+                        _rtsCamera.Distance += zoom * ZoomSpeed * num;
                     }
                 }
                 else
                 {
                     if (Input.GetKey(ZoomOutKey))
                     {
-                        _rtsCamera.Distance += ZoomSpeed * Time.deltaTime;
+                        _rtsCamera.Distance += ZoomSpeed * num;
                     }
                     if (Input.GetKey(ZoomInKey))
                     {
-                        _rtsCamera.Distance -= ZoomSpeed * Time.deltaTime;
+                        _rtsCamera.Distance -= ZoomSpeed * num;
                     }
                 }
             }
@@ -182,18 +182,18 @@ namespace BetterPerspective
                     var tilt = Input.GetAxisRaw(TiltInputAxis);
                     if (Mathf.Abs(tilt) > 0.001f)
                     {
-                        _rtsCamera.Tilt += tilt * TiltSpeed * Time.deltaTime;
+                        _rtsCamera.Tilt += tilt * TiltSpeed * num;
                     }
                 }
                 else
                 {
                     if (Input.GetKey(TiltUpKey))
                     {
-                        _rtsCamera.Tilt += TiltSpeed * Time.deltaTime;
+                        _rtsCamera.Tilt += TiltSpeed * num;
                     }
                     if (Input.GetKey(TiltDownKey))
                     {
-                        _rtsCamera.Tilt -= TiltSpeed * Time.deltaTime;
+                        _rtsCamera.Tilt -= TiltSpeed * num;
                     }
                 }
             }

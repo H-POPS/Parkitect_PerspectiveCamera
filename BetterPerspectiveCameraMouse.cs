@@ -79,13 +79,14 @@ namespace BetterPerspective
 
         protected void Update()
         {
-            if (Time.timeScale > .2f)
-            {
-                MoveSpeed = 20f / Time.timeScale;
-                RotateSpeed = RotateSpeedVar / Time.timeScale;
-                ZoomSpeed = ZoomSpeedVar / Time.timeScale;
-                TiltSpeed = TiltSpeedVar / Time.timeScale;
-            }
+            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+           
+                MoveSpeed = 20f;
+                RotateSpeed = RotateSpeedVar;
+                ZoomSpeed = ZoomSpeedVar;
+                TiltSpeed = TiltSpeedVar;
+            
+
 
             if (_rtsCamera == null)
                 return; 
@@ -94,7 +95,7 @@ namespace BetterPerspective
             {
 
                 var scroll = -Input.GetAxisRaw(ZoomInputAxis);
-                _rtsCamera.Distance -= scroll * ZoomSpeed * Time.deltaTime;
+                _rtsCamera.Distance -= scroll * ZoomSpeed * num;
             }
 
             if (Input.GetKey(MouseOrbitButton))
@@ -102,8 +103,8 @@ namespace BetterPerspective
                 if (AllowPan && (Input.GetKey(PanKey1) || Input.GetKey(PanKey2)))
                 {
                     
-                    var panX = -1 * Input.GetAxisRaw("Mouse X") * PanSpeed * Time.deltaTime;
-                    var panZ = -1 * Input.GetAxisRaw("Mouse Y") * PanSpeed * Time.deltaTime;
+                    var panX = -1 * Input.GetAxisRaw("Mouse X") * PanSpeed * num;
+                    var panZ = -1 * Input.GetAxisRaw("Mouse Y") * PanSpeed * num;
 
                     _rtsCamera.AddToPosition(panX, 0, panZ);
 
@@ -119,13 +120,13 @@ namespace BetterPerspective
                     if (AllowTilt)
                     {
                         var tilt = Input.GetAxisRaw(TiltInputAxis);
-                        _rtsCamera.Tilt -= tilt * TiltSpeed * Time.deltaTime;
+                        _rtsCamera.Tilt -= tilt * TiltSpeed * num;
                     }
 
                     if (AllowRotate)
                     {
                         var rot = Input.GetAxisRaw(RotateInputAxis);
-                        _rtsCamera.Rotation += rot * RotateSpeed * Time.deltaTime;
+                        _rtsCamera.Rotation += rot * RotateSpeed * num;
                     }
                 }
             }
@@ -137,23 +138,23 @@ namespace BetterPerspective
                 if (Input.mousePosition.y > (Screen.height - ScreenEdgeBorderWidth))
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, MoveSpeed * Time.deltaTime);
+                    _rtsCamera.AddToPosition(0, 0, MoveSpeed * num);
                 }
                 else if (Input.mousePosition.y < ScreenEdgeBorderWidth)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, -1 * MoveSpeed * Time.deltaTime);
+                    _rtsCamera.AddToPosition(0, 0, -1 * MoveSpeed * num);
                 }
 
                 if (Input.mousePosition.x > (Screen.width - ScreenEdgeBorderWidth))
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(MoveSpeed * Time.deltaTime, 0, 0);
+                    _rtsCamera.AddToPosition(MoveSpeed * num, 0, 0);
                 }
                 else if (Input.mousePosition.x < ScreenEdgeBorderWidth)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(-1 * MoveSpeed * Time.deltaTime, 0, 0);
+                    _rtsCamera.AddToPosition(-1 * MoveSpeed * num, 0, 0);
                 }
 
                 if (hasMovement && _rtsCamera.IsFollowing && ScreenEdgeMoveBreaksFollow)

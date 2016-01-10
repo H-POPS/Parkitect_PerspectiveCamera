@@ -162,6 +162,8 @@ namespace BetterPerspective
 
         protected void Update()
         {
+            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+            
             if(Input.GetKeyUp(KeyCode.P))
             {
                 ShowSettings = !ShowSettings;
@@ -177,14 +179,13 @@ namespace BetterPerspective
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
             }
-            if (Time.timeScale > .2f)
-            {
+           
 
-                MoveDampening = Smoothness / Time.timeScale;
-                ZoomDampening = Smoothness / Time.timeScale;
-                RotationDampening = Smoothness / Time.timeScale;
-                TiltDampening = Smoothness / Time.timeScale;
-            }
+                MoveDampening = Smoothness;
+                ZoomDampening = Smoothness;
+                RotationDampening = Smoothness;
+                TiltDampening = Smoothness;
+            
             if (lockedOnto != null)
             {
                 Follow(lockedOnto, false);
@@ -204,7 +205,7 @@ namespace BetterPerspective
 
         protected void LateUpdate()
         {
-
+            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
             if (IsFollowing)
             {
                 LookAt = _followTarget.position;
@@ -224,10 +225,10 @@ namespace BetterPerspective
 
             if (Smoothing)
             {
-                _currRotation = Mathf.LerpAngle(_currRotation, Rotation, Time.deltaTime * RotationDampening);
-                _currDistance = Mathf.Lerp(_currDistance, Distance, Time.deltaTime * ZoomDampening);
-                _currTilt = Mathf.LerpAngle(_currTilt, Tilt, Time.deltaTime * TiltDampening);
-                _target.transform.position = Vector3.Lerp(_target.transform.position, LookAt, Time.deltaTime * MoveDampening);
+                _currRotation = Mathf.LerpAngle(_currRotation, Rotation, num * RotationDampening);
+                _currDistance = Mathf.Lerp(_currDistance, Distance, num * ZoomDampening);
+                _currTilt = Mathf.LerpAngle(_currTilt, Tilt, num * TiltDampening);
+                _target.transform.position = Vector3.Lerp(_target.transform.position, LookAt, num * MoveDampening);
             }
             else
             {
