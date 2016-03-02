@@ -88,7 +88,7 @@ namespace BetterPerspective
         
         protected void Update()
         {
-            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+            float num = 0.02f;
            
                 FastMoveSpeed = MoveSpeedVar * 2;
                 MoveSpeed = MoveSpeedVar;

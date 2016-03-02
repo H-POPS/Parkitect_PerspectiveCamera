@@ -83,7 +83,7 @@ namespace BetterPerspective
             Smoothness = 7f;
             
             _lastDebugCamera = true;
-            LookAtHeightOffset = 1f;
+            LookAtHeightOffset = .2f;
             TerrainHeightViaPhysics = true;
             TerrainPhysicsLayerMask = 1 << 12;
             GetTerrainHeight = null;
@@ -98,15 +98,15 @@ namespace BetterPerspective
             MaxBounds = new Vector3(100, 100, 100);
 
             Distance = 10f;
-            MinDistance = 2f;
-            MaxDistance = 32f;
+            MinDistance = .2f;
+            MaxDistance = 52f;
             ZoomDampening = 5f;
 
             Rotation = -90f;
             RotationDampening = 5f;
 
             Tilt = 45f;
-            MinTilt = 10f;
+            MinTilt = 2f;
             MaxTilt = 85f;
             TiltDampening = 5f;
 
@@ -162,7 +162,7 @@ namespace BetterPerspective
 
         protected void Update()
         {
-            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+            float num = 0.02f;
             
             if(Input.GetKeyUp(KeyCode.P))
             {
@@ -205,7 +205,7 @@ namespace BetterPerspective
 
         protected void LateUpdate()
         {
-            float num = Mathf.Min(Time.unscaledDeltaTime, 0.2f);
+            float num = 0.02f;
             if (IsFollowing)
             {
                 LookAt = _followTarget.position;
