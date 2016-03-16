@@ -46,7 +46,7 @@ namespace BetterPerspective
             Camera.main.gameObject.AddComponent<BetterPerspectiveCamera>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraKeys>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraMouse>();
-            
+            Camera.main.gameObject.AddComponent<AudioListener>();
             Object.Destroy(go);
 
         }
