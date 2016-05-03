@@ -162,7 +162,6 @@ namespace BetterPerspective
 
         protected void Update()
         {
-            float num = 0.02f;
             
             if(Input.GetKeyUp(KeyCode.P))
             {
