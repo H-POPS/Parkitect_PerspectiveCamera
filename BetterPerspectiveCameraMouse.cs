@@ -85,7 +85,7 @@ namespace BetterPerspective
                 RotateSpeed = RotateSpeedVar;
                 ZoomSpeed = ZoomSpeedVar;
                 TiltSpeed = TiltSpeedVar;
-            
+                PanSpeed= PanSpeedVar;
 
 
             if (_rtsCamera == null)
