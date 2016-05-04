@@ -30,8 +30,6 @@ namespace BetterPerspective
         public float MinTilt;
         public float MaxTilt;
 
-        public Func<float, float, float> GetTerrainHeight;
-
         public bool TerrainHeightViaPhysics;
         public LayerMask TerrainPhysicsLayerMask;
 
