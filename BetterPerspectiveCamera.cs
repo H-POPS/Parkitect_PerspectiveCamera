@@ -84,7 +84,6 @@ namespace BetterPerspective
             LookAtHeightOffset = .2f;
             TerrainHeightViaPhysics = true;
             TerrainPhysicsLayerMask = 1 << 12;
-            GetTerrainHeight = null;
 
             TargetVisbilityViaPhysics = false;
             CameraRadius = 1f;
@@ -455,12 +454,6 @@ namespace BetterPerspective
 
         private float GetHeightAt(float x, float z)
         {
-
-            if (GetTerrainHeight != null)
-            {
-                return GetTerrainHeight(x, z);
-            }
-
 
             if (TerrainHeightViaPhysics)
             {
