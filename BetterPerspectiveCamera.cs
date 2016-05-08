@@ -432,7 +432,7 @@ namespace BetterPerspective
         }
         public void Follow(GameObject followTarget, bool snap)
         {
-            
+           Follow (followTarget.transform, snap); 
         }
 
 
