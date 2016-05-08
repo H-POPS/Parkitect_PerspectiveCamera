@@ -438,6 +438,7 @@ namespace BetterPerspective
 
         public void EndFollow()
         {
+            base.lockOnto (null);
             Follow((Transform)null, false);
         }
 
