@@ -75,8 +75,6 @@ namespace BetterPerspective
         {
             
             
-            
-            
             Smoothing = true;
             Smoothness = 7f;
             
@@ -91,8 +89,7 @@ namespace BetterPerspective
 
             LookAt = new Vector3(10, 0, 22.5f);
             MoveDampening = 5f;
-            MinBounds = new Vector3(0,3, 0);
-            MaxBounds = new Vector3(100, 100, 100);
+            MinBounds = new Vector3(.6f,3, .6f);
 
             Distance = 10f;
             MinDistance = .2f;
@@ -155,12 +152,17 @@ namespace BetterPerspective
 
 
             CreateTarget();
+            Park park = GameController.Instance.park;
+            MaxBounds = new Vector3(park.xSize- .6f, park.ySize, park.zSize- .6f);
         }
 
         protected void Update()
         {
-            
-            if(Input.GetKeyUp(KeyCode.P))
+
+
+            Park park = GameController.Instance.park;
+            MaxBounds = new Vector3(park.xSize- .6f, park.ySize, park.zSize- .6f);
+            if (Input.GetKeyUp(KeyCode.P))
             {
                 ShowSettings = !ShowSettings;
             }
