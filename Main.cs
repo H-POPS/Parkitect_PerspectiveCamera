@@ -20,10 +20,10 @@ namespace BetterPerspective
             cam.backgroundColor = cam2.backgroundColor;
             cam.clearFlags = cam2.clearFlags;
             cam.clearStencilAfterLightingPass = cam2.clearStencilAfterLightingPass;
-            cam.cullingMask = cam2.cullingMask;
+            //cam.cullingMask = cam2.cullingMask;
             cam.depth = cam2.depth;
             cam.depthTextureMode = cam2.depthTextureMode;
-            cam.farClipPlane = cam2.farClipPlane;
+            //cam.farClipPlane = cam2.farClipPlane;
             cam.fieldOfView = cam2.fieldOfView;
             cam.hdr = cam2.hdr;
             cam.layerCullDistances = cam2.layerCullDistances;
