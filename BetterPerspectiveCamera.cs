@@ -154,6 +154,8 @@ namespace BetterPerspective
             CreateTarget();
             Park park = GameController.Instance.park;
             MaxBounds = new Vector3(park.xSize- .6f, park.ySize, park.zSize- .6f);
+
+			CullingGroupManager.Instance.setTargetCamera(camera);
         }
 
         protected void Update()
@@ -381,7 +383,7 @@ namespace BetterPerspective
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Drawing distance:");
-            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 20f, 300f);
+            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 50f, 300f);
             RenderSettings.fogEndDistance = camera.farClipPlane;
             RenderSettings.fogStartDistance = camera.farClipPlane - 10f;
             GUILayout.EndHorizontal();
@@ -421,7 +423,7 @@ namespace BetterPerspective
             PlayerPrefs.SetFloat("MoveSpeedVar", KeysScript.MoveSpeedVar);
             PlayerPrefs.SetFloat("RotateSpeedVar", MouseScript.RotateSpeedVar);
             PlayerPrefs.SetFloat("ZoomSpeedVar", MouseScript.ZoomSpeedVar);
-            PlayerPrefs.SetFloat("farClipPlane", camera.farClipPlane);
+            PlayerPrefs.SetFloat("viewDistance", camera.farClipPlane);
         }
         void Load()
         {
@@ -430,7 +432,7 @@ namespace BetterPerspective
             KeysScript.MoveSpeedVar = PlayerPrefs.GetFloat("MoveSpeedVar");
             MouseScript.RotateSpeedVar = PlayerPrefs.GetFloat("RotateSpeedVar");
             MouseScript.ZoomSpeedVar = PlayerPrefs.GetFloat("ZoomSpeedVar");
-            camera.farClipPlane = PlayerPrefs.GetFloat("farClipPlane");
+            camera.farClipPlane = PlayerPrefs.GetFloat("viewDistance", 50f);
         }
         public void Follow(GameObject followTarget, bool snap)
         {
