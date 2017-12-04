@@ -93,7 +93,7 @@ namespace BetterPerspective
 
             Distance = 10f;
             MinDistance = .2f;
-            MaxDistance = 52f;
+            MaxDistance = 152f;
             ZoomDampening = 5f;
 
             Rotation = -90f;
@@ -112,7 +112,7 @@ namespace BetterPerspective
 
         protected void Start()
         {
-
+            
             KeysScript = GetComponent<BetterPerspectiveCameraKeys>();
             MouseScript = GetComponent<BetterPerspectiveCameraMouse>();
             camera = GetComponent<Camera>();
@@ -205,6 +205,7 @@ namespace BetterPerspective
 
         protected void LateUpdate()
         {
+            camera.nearClipPlane = .2f;
             float num = 0.02f;
             if (IsFollowing)
             {
@@ -358,7 +359,6 @@ namespace BetterPerspective
         {
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
             Smoothing = GUILayout.Toggle(Smoothing, "Smooth");
-
             GUILayout.BeginHorizontal();
             GUILayout.Label("Smoothness:");
             Smoothness = GUILayout.HorizontalSlider(Smoothness, 10.0F, 1f);
@@ -381,9 +381,10 @@ namespace BetterPerspective
             KeysScript.ZoomSpeedVar = MouseScript.ZoomSpeedVar;
             GUILayout.EndHorizontal();
 
+            camera.nearClipPlane = GUILayout.HorizontalSlider(camera.nearClipPlane, 0f, 1500f);
             GUILayout.BeginHorizontal();
             GUILayout.Label("Drawing distance:");
-            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 50f, 300f);
+            camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 10f, 1500f);
             RenderSettings.fogEndDistance = camera.farClipPlane;
             RenderSettings.fogStartDistance = camera.farClipPlane - 10f;
             GUILayout.EndHorizontal();

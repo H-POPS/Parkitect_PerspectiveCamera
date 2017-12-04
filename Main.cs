@@ -25,10 +25,9 @@ namespace BetterPerspective
             cam.depthTextureMode = cam2.depthTextureMode;
             //cam.farClipPlane = cam2.farClipPlane;
             cam.fieldOfView = cam2.fieldOfView;
-            cam.hdr = cam2.hdr;
+            cam.allowHDR = cam2.allowHDR;
             cam.layerCullDistances = cam2.layerCullDistances;
             cam.layerCullSpherical = cam2.layerCullSpherical;
-            cam.nearClipPlane = cam2.nearClipPlane;
             cam.pixelRect = cam2.pixelRect;
             cam.projectionMatrix = cam2.projectionMatrix;
             cam.rect = cam2.rect;
@@ -46,6 +45,7 @@ namespace BetterPerspective
             Camera.main.gameObject.AddComponent<BetterPerspectiveCamera>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraKeys>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraMouse>();
+            Camera.main.gameObject.AddComponent<AudioListener>();
             Camera.main.gameObject.AddComponent<AudioListener>();
             Object.Destroy(go);
 
