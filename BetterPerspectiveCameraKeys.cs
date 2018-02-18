@@ -89,6 +89,7 @@ namespace BetterPerspective
         protected void Update()
         {
             float num = 0.02f;
+            float distanceModifier = Mathf.Sqrt(_rtsCamera.Distance / _rtsCamera.MaxDistance) * 2;
            
                 FastMoveSpeed = MoveSpeedVar * 2;
                 MoveSpeed = MoveSpeedVar;
@@ -113,14 +114,14 @@ namespace BetterPerspective
                 if (Mathf.Abs(h) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(h * speed * num, 0, 0);
+                    _rtsCamera.AddToPosition(h * speed * num * distanceModifier, 0, 0);
                 }
 
                 var v = Input.GetAxisRaw(VerticalInputAxis);
                 if (Mathf.Abs(v) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, v * speed * num);
+                    _rtsCamera.AddToPosition(0, 0, v * speed * num * distanceModifier);
                 }
 
                 if (hasMovement && _rtsCamera.IsFollowing && MovementBreaksFollow)
