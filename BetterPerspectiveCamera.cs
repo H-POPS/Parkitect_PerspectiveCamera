@@ -206,6 +206,7 @@ namespace BetterPerspective
         protected void LateUpdate()
         {
             camera.nearClipPlane = .2f;
+            camera.farClipPlane = Distance * 1.5f + 100;
             float num = 0.02f;
             if (IsFollowing)
             {
