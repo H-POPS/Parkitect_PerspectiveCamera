@@ -80,8 +80,11 @@ namespace BetterPerspective
         protected void Update()
         {
             float num = 0.02f;
-           
-                MoveSpeed = 20f;
+            float distanceMultiplier = _rtsCamera.Distance * 7 / _rtsCamera.MaxDistance + 0.1f;
+            float distanceModifier = Mathf.Sqrt(_rtsCamera.Distance / _rtsCamera.MaxDistance) * 2;
+
+
+            MoveSpeed = 20f;
                 RotateSpeed = RotateSpeedVar;
                 ZoomSpeed = ZoomSpeedVar;
                 TiltSpeed = TiltSpeedVar;
@@ -95,7 +98,7 @@ namespace BetterPerspective
             {
 
                 var scroll = -Input.GetAxisRaw(ZoomInputAxis);
-                _rtsCamera.Distance -= scroll * ZoomSpeed * num;
+                _rtsCamera.Distance -= scroll * ZoomSpeed * num * distanceMultiplier;
             }
 
             if (Input.GetKey(MouseOrbitButton))
@@ -138,23 +141,23 @@ namespace BetterPerspective
                 if (Input.mousePosition.y > (Screen.height - ScreenEdgeBorderWidth))
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, MoveSpeed * num);
+                    _rtsCamera.AddToPosition(0, 0, MoveSpeed * num * distanceModifier);
                 }
                 else if (Input.mousePosition.y < ScreenEdgeBorderWidth)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, -1 * MoveSpeed * num);
+                    _rtsCamera.AddToPosition(0, 0, -1 * MoveSpeed * num * distanceModifier);
                 }
 
                 if (Input.mousePosition.x > (Screen.width - ScreenEdgeBorderWidth))
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(MoveSpeed * num, 0, 0);
+                    _rtsCamera.AddToPosition(MoveSpeed * num * distanceModifier, 0, 0);
                 }
                 else if (Input.mousePosition.x < ScreenEdgeBorderWidth)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(-1 * MoveSpeed * num, 0, 0);
+                    _rtsCamera.AddToPosition(-1 * MoveSpeed * num * distanceModifier, 0, 0);
                 }
 
                 if (hasMovement && _rtsCamera.IsFollowing && ScreenEdgeMoveBreaksFollow)
