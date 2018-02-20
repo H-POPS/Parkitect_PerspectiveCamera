@@ -89,17 +89,15 @@ namespace BetterPerspective
         protected void Update()
         {
             float num = 0.02f;
-            float distanceMultiplier = _rtsCamera.Distance * 7 / _rtsCamera.MaxDistance + 0.1f;
-            float distanceModifier = Mathf.Sqrt(_rtsCamera.Distance / _rtsCamera.MaxDistance) * 2;
-
+           
                 FastMoveSpeed = MoveSpeedVar * 2;
                 MoveSpeed = MoveSpeedVar;
                 RotateSpeed = RotateSpeedVar;
                 ZoomSpeed = ZoomSpeedVar;
                 TiltSpeed = 90f;
             
-            if (_rtsCamera == null || UIUtility.isInputFieldFocused())
-                return; // no camera!... or is he typing? who cares, bail!
+            if (_rtsCamera == null)
+                return; // no camera, bail!
 
             if (AllowMove && (!_rtsCamera.IsFollowing || MovementBreaksFollow))
             {
@@ -115,14 +113,14 @@ namespace BetterPerspective
                 if (Mathf.Abs(h) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(h * speed * num * distanceModifier, 0, 0);
+                    _rtsCamera.AddToPosition(h * speed * num, 0, 0);
                 }
 
                 var v = Input.GetAxisRaw(VerticalInputAxis);
                 if (Mathf.Abs(v) > 0.001f)
                 {
                     hasMovement = true;
-                    _rtsCamera.AddToPosition(0, 0, v * speed * num * distanceModifier);
+                    _rtsCamera.AddToPosition(0, 0, v * speed * num);
                 }
 
                 if (hasMovement && _rtsCamera.IsFollowing && MovementBreaksFollow)
@@ -161,18 +159,18 @@ namespace BetterPerspective
                     var zoom = Input.GetAxisRaw(ZoomInputAxis);
                     if (Mathf.Abs(zoom) > 0.001f)
                     {
-                        _rtsCamera.Distance += zoom * ZoomSpeed * num * distanceMultiplier;
+                        _rtsCamera.Distance += zoom * ZoomSpeed * num;
                     }
                 }
                 else
                 {
                     if (Input.GetKey(ZoomOutKey))
                     {
-                        _rtsCamera.Distance += ZoomSpeed * num * distanceMultiplier;
+                        _rtsCamera.Distance += ZoomSpeed * num;
                     }
                     if (Input.GetKey(ZoomInKey))
                     {
-                        _rtsCamera.Distance -= ZoomSpeed * num * distanceMultiplier;
+                        _rtsCamera.Distance -= ZoomSpeed * num;
                     }
                 }
             }

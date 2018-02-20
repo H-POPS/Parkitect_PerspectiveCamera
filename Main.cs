@@ -41,6 +41,7 @@ namespace BetterPerspective
             cam.useOcclusionCulling = cam2.useOcclusionCulling;
             
 
+
             Object.DestroyImmediate(cam.gameObject.GetComponent<CameraController>());
             Camera.main.gameObject.AddComponent<BetterPerspectiveCamera>();
             Camera.main.gameObject.AddComponent<BetterPerspectiveCameraKeys>();
@@ -49,6 +50,7 @@ namespace BetterPerspective
             Camera.main.gameObject.AddComponent<AudioListener>();
             Object.Destroy(go);
 
+            Settings.Instance.changeGraphicsBloom(false);
         }
 
         public void onDisabled()
@@ -59,9 +61,9 @@ namespace BetterPerspective
             Camera.main.gameObject.AddComponent<CameraController>();
         }
 
-        public string Name { get { return "BetterPerspective"; } }
-        public string Description { get { return "Better Perspective camera"; } }
-        public string Identifier { get; set; }
+        public string Name { get { return "Perspective camera"; } }
+        public string Description { get { return "Perspective camera for your game"; } }
+        public string Identifier { get { return "H-POPS@PerspectiveCamera"; }}
 
     }
     

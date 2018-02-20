@@ -6,8 +6,8 @@
     <ProjectGuid>{7B4F7F34-4311-4E88-AB8C-11AC10F38191}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>ClassLibrary</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <AssemblyName>H-POPS%40PerspectiveCamera.dll</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -43,10 +43,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Mods\H-POPS%40PerspectiveCamera\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>BetterPerspective</RootNamespace>
@@ -71,7 +72,6 @@
     <Content Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="mod.json" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
