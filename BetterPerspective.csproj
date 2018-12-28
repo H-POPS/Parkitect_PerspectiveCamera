@@ -68,9 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="mod.json" />
     <None Include="README.md" />
   </ItemGroup>
