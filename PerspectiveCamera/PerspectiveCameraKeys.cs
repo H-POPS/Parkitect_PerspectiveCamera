@@ -1,27 +1,19 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 
-
-namespace BetterPerspective
+namespace PerspectiveCamera
 {
-    public class BetterPerspectiveCameraKeys : MonoBehaviour
+    public class PerspectiveCameraKeys : MonoBehaviour
     {
         public bool AllowMove;
-        public float MoveSpeed;
-        public float MoveSpeedVar;
         public bool AllowFastMove;
         public float FastMoveSpeed;
         public KeyCode FastMoveKeyCode1;
         public KeyCode FastMoveKeyCode2;
 
         public bool AllowRotate;
-        public float RotateSpeed;
-        public float RotateSpeedVar;
 
         public bool AllowZoom;
-        public float ZoomSpeed;
-        public float ZoomSpeedVar;
 
         public bool AllowTilt;
         public float TiltSpeed;
@@ -51,15 +43,13 @@ namespace BetterPerspective
 
         //
 
-        private BetterPerspectiveCamera _rtsCamera;
+        private PerspectiveCamera _camera;
 
         //
 
         public void Reset()
         {
             AllowMove = true;
-            MoveSpeedVar = 15f;
-            MoveSpeed = MoveSpeedVar;
 
             AllowFastMove = true;
             FastMoveSpeed = 40f;
@@ -67,10 +57,8 @@ namespace BetterPerspective
             FastMoveKeyCode2 = KeyCode.RightShift;
 
             AllowRotate = true;
-            RotateSpeedVar = 180f;
 
             AllowZoom = true;
-            ZoomSpeedVar = 15f;
 
             AllowTilt = true;
             TiltSpeed = 90f;
@@ -83,7 +71,7 @@ namespace BetterPerspective
 
         protected void Start()
         {
-            _rtsCamera = gameObject.GetComponent<BetterPerspectiveCamera>();
+            _camera = gameObject.GetComponent<PerspectiveCamera>();
         }
 
         protected void Update()
@@ -91,23 +79,23 @@ namespace BetterPerspective
             try
             {
                 float num = 0.02f;
-                float distanceMultiplier = _rtsCamera.Distance * 7 / _rtsCamera.MaxDistance + 0.1f;
-                float distanceModifier = Mathf.Sqrt(_rtsCamera.Distance / _rtsCamera.MaxDistance) * 2;
+                float distanceMultiplier = _camera.Distance * 7 / _camera.MaxDistance + 0.1f;
+                float distanceModifier = Mathf.Sqrt(_camera.Distance / _camera.MaxDistance) * 2;
 
-                FastMoveSpeed = MoveSpeedVar * 2;
-                MoveSpeed = MoveSpeedVar;
-                RotateSpeed = RotateSpeedVar;
-                ZoomSpeed = ZoomSpeedVar;
+                var moveSpeed = PerspectiveCameraSettings.Instance.MoveSpeed;
+                FastMoveSpeed = moveSpeed * 2;
+                var rotateSpeed = PerspectiveCameraSettings.Instance.RotateSpeed - 100f;
+                var zoomSpeed = PerspectiveCameraSettings.Instance.ZoomSpeed;
                 TiltSpeed = 90f;
 
-                if (_rtsCamera == null || UIUtility.isInputFieldFocused())
+                if (_camera == null || UIUtility.isInputFieldFocused())
                     return; // no camera!... or is he typing? who cares, bail!
 
-                if (AllowMove && (!_rtsCamera.IsFollowing || MovementBreaksFollow))
+                if (AllowMove && (!_camera.IsFollowing || MovementBreaksFollow))
                 {
                     var hasMovement = false;
 
-                    var speed = MoveSpeed;
+                    var speed = moveSpeed;
                     if (AllowFastMove && (Input.GetKey(FastMoveKeyCode1) || Input.GetKey(FastMoveKeyCode2)))
                     {
                         speed = FastMoveSpeed;
@@ -117,18 +105,18 @@ namespace BetterPerspective
                     if (Mathf.Abs(h) > 0.001f)
                     {
                         hasMovement = true;
-                        _rtsCamera.AddToPosition(h * speed * num * distanceModifier, 0, 0);
+                        _camera.AddToPosition(h * speed * num * distanceModifier, 0, 0);
                     }
 
                     var v = Input.GetAxisRaw(VerticalInputAxis);
                     if (Mathf.Abs(v) > 0.001f)
                     {
                         hasMovement = true;
-                        _rtsCamera.AddToPosition(0, 0, v * speed * num * distanceModifier);
+                        _camera.AddToPosition(0, 0, v * speed * num * distanceModifier);
                     }
 
-                    if (hasMovement && _rtsCamera.IsFollowing && MovementBreaksFollow)
-                        _rtsCamera.EndFollow();
+                    if (hasMovement && _camera.IsFollowing && MovementBreaksFollow)
+                        _camera.EndFollow();
                 }
 
 
@@ -139,19 +127,19 @@ namespace BetterPerspective
                         var rot = Input.GetAxisRaw(RotateInputAxis);
                         if (Mathf.Abs(rot) > 0.001f)
                         {
-                            _rtsCamera.Rotation += rot * RotateSpeed * num;
+                            _camera.Rotation += rot * rotateSpeed * num;
                         }
                     }
                     else
                     {
                         if (Input.GetKey(RotateLeftKey))
                         {
-                            _rtsCamera.Rotation += RotateSpeed * num;
+                            _camera.Rotation += rotateSpeed * num;
                         }
 
                         if (Input.GetKey(RotateRightKey))
                         {
-                            _rtsCamera.Rotation -= RotateSpeed * num;
+                            _camera.Rotation -= rotateSpeed * num;
                         }
                     }
                 }
@@ -163,19 +151,19 @@ namespace BetterPerspective
                         var zoom = Input.GetAxisRaw(ZoomInputAxis);
                         if (Mathf.Abs(zoom) > 0.001f)
                         {
-                            _rtsCamera.Distance += zoom * ZoomSpeed * num * distanceMultiplier;
+                            _camera.Distance += zoom * zoomSpeed * num * distanceMultiplier;
                         }
                     }
                     else
                     {
                         if (Input.GetKey(ZoomOutKey))
                         {
-                            _rtsCamera.Distance += ZoomSpeed * num * distanceMultiplier;
+                            _camera.Distance += zoomSpeed * num * distanceMultiplier;
                         }
 
                         if (Input.GetKey(ZoomInKey))
                         {
-                            _rtsCamera.Distance -= ZoomSpeed * num * distanceMultiplier;
+                            _camera.Distance -= zoomSpeed * num * distanceMultiplier;
                         }
                     }
                 }
@@ -187,29 +175,28 @@ namespace BetterPerspective
                         var tilt = Input.GetAxisRaw(TiltInputAxis);
                         if (Mathf.Abs(tilt) > 0.001f)
                         {
-                            _rtsCamera.Tilt += tilt * TiltSpeed * num;
+                            _camera.Tilt += tilt * TiltSpeed * num;
                         }
                     }
                     else
                     {
                         if (Input.GetKey(TiltUpKey))
                         {
-                            _rtsCamera.Tilt += TiltSpeed * num;
+                            _camera.Tilt += TiltSpeed * num;
                         }
 
                         if (Input.GetKey(TiltDownKey))
                         {
-                            _rtsCamera.Tilt -= TiltSpeed * num;
+                            _camera.Tilt -= TiltSpeed * num;
                         }
                     }
                 }
-                //
 
                 if (ResetKey != KeyCode.None)
                 {
                     if (Input.GetKeyDown(ResetKey))
                     {
-                        _rtsCamera.ResetToInitialValues(IncludePositionOnReset, false);
+                        _camera.ResetToInitialValues(IncludePositionOnReset, false);
                     }
                 }
             }

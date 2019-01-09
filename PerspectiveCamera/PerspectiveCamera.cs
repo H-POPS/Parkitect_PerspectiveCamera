@@ -1,22 +1,19 @@
 ﻿using System;
-using UnityEngine;
 using System.Collections;
 using System.Reflection;
-using Parkitect.UI;
-using Parkitect;
+using PostFX;
+using UnityEngine;
 
-namespace BetterPerspective
+namespace PerspectiveCamera
 {
-    public class BetterPerspectiveCamera : CameraController, IUpdateEvent
+    public class PerspectiveCamera : CameraController, IUpdateEvent
     {
         public bool ShowSettings = true;
         public Vector3 LookAt;
         public float Distance;
         public float Rotation;
         public float Tilt;
-
-        public bool Smoothing;
-        public float Smoothness;
+        
         public float MoveDampening;
         public float ZoomDampening;
         public float RotationDampening;
@@ -66,16 +63,14 @@ namespace BetterPerspective
         private Transform _followTarget;
 
         private bool _lastDebugCamera;
-        private BetterPerspectiveCameraKeys KeysScript;
-        private BetterPerspectiveCameraMouse MouseScript;
-        public Camera camera;
+        private PerspectiveCameraKeys _keysScript;
+        private PerspectiveCameraMouse _mouseScript;
+        public Camera Camera;
+        private TiltShift _tiltShift;
 
 
         public void Reset()
         {
-            Smoothing = true;
-            Smoothness = 7f;
-
             _lastDebugCamera = true;
             LookAtHeightOffset = .2f;
             TerrainHeightViaPhysics = true;
@@ -111,42 +106,24 @@ namespace BetterPerspective
         {
             ObjectEventManager.remove(this);
             ObjectEventManager.add(this);
-            KeysScript = GetComponent<BetterPerspectiveCameraKeys>();
-            MouseScript = GetComponent<BetterPerspectiveCameraMouse>();
-            camera = GetComponent<Camera>();
+            _tiltShift = Camera.main.GetComponent<TiltShift>();
+            _keysScript = GetComponent<PerspectiveCameraKeys>();
+            _keysScript = GetComponent<PerspectiveCameraKeys>();
+            _mouseScript = GetComponent<PerspectiveCameraMouse>();
+            Camera = GetComponent<Camera>();
+
 
             var prop = this.GetType().BaseType?.GetField("controlledCamera", BindingFlags.NonPublic
                                                                              | BindingFlags.Instance);
             if (prop != null)
-                prop.SetValue(this, camera);
-            else
-                ErrorMessageController.showErrorMessage(" NOO ");
+                prop.SetValue(this, Camera);
 
-
-            //_dynMethod = this.GetType().BaseType?.GetMethod("updateZoom",
-            //    BindingFlags.NonPublic | BindingFlags.Instance);
-
-
-            StartCoroutine(Wait(2F));
-            if (!PlayerPrefs.HasKey("Smooth"))
-            {
-                Reset();
-                KeysScript.Reset();
-                MouseScript.Reset();
-            }
-            else
-            {
-                Reset();
-                KeysScript.Reset();
-                MouseScript.Reset();
-                ShowSettings = false;
-                Load();
-            }
+            Reset();
+            _keysScript.Reset();
+            _mouseScript.Reset();
 
             if (GetComponent<Rigidbody>())
-            {
                 GetComponent<Rigidbody>().freezeRotation = true;
-            }
 
 
             _initialLookAt = LookAt;
@@ -164,7 +141,7 @@ namespace BetterPerspective
             Park park = GameController.Instance.park;
             MaxBounds = new Vector3(park.xSize - .6f, park.ySize, park.zSize - .6f);
 
-            CullingGroupManager.Instance.setTargetCamera(camera);
+            CullingGroupManager.Instance.setTargetCamera(Camera);
 
 
             EventManager.Instance.OnNightModeChanged += Instance_OnNightModeChanged;
@@ -174,12 +151,12 @@ namespace BetterPerspective
         {
             if (isNightMode)
             {
-                camera.clearFlags = CameraClearFlags.SolidColor;
-                camera.backgroundColor = Color.black;
+                Camera.clearFlags = CameraClearFlags.SolidColor;
+                Camera.backgroundColor = Color.black;
             }
             else
             {
-                camera.clearFlags = CameraClearFlags.Skybox;
+                Camera.clearFlags = CameraClearFlags.Skybox;
             }
         }
 
@@ -203,11 +180,11 @@ namespace BetterPerspective
                 Cursor.lockState = CursorLockMode.None;
             }
 
-
-            MoveDampening = Smoothness;
-            ZoomDampening = Smoothness;
-            RotationDampening = Smoothness;
-            TiltDampening = Smoothness;
+            var smoothness = PerspectiveCameraSettings.Instance.Smoothness;
+            MoveDampening = smoothness;
+            ZoomDampening = smoothness;
+            RotationDampening = smoothness;
+            TiltDampening = smoothness;
 
             if (lockedOnto != null)
             {
@@ -224,7 +201,7 @@ namespace BetterPerspective
                 }
             }
 
-            camera.nearClipPlane = .1f;
+            Camera.nearClipPlane = .1f;
 
             AdaptFarClipPaneToFps();
             LUpdate();
@@ -236,9 +213,9 @@ namespace BetterPerspective
         {
             var fps = 1.0f / Time.deltaTime;
 
-            if (fps < 50) camera.farClipPlane = Math.Max(80, camera.farClipPlane - 30f * Time.deltaTime);
+            if (fps < 50) Camera.farClipPlane = Math.Max(80, Camera.farClipPlane - 30f * Time.deltaTime);
 
-            if (fps > 55) camera.farClipPlane = Math.Min(260, camera.farClipPlane + 20f * Time.deltaTime);
+            if (fps > 55) Camera.farClipPlane = Math.Min(260, Camera.farClipPlane + 20f * Time.deltaTime);
         }
 
 
@@ -265,7 +242,7 @@ namespace BetterPerspective
             LookAt = new Vector3(Mathf.Clamp(LookAt.x, MinBounds.x, MaxBounds.x),
                 Mathf.Clamp(LookAt.y, MinBounds.y, MaxBounds.y), Mathf.Clamp(LookAt.z, MinBounds.z, MaxBounds.z));
 
-            if (Smoothing)
+            if (PerspectiveCameraSettings.Instance.Smoothing)
             {
                 _currRotation = Mathf.LerpAngle(_currRotation, Rotation, num * RotationDampening);
                 _currDistance = Mathf.Lerp(_currDistance, Distance, num * ZoomDampening);
@@ -293,11 +270,11 @@ namespace BetterPerspective
                 EnsureTargetIsVisible();
             }
 
-            
-           // setZoomPercentage(Mathf.InverseLerp(MinDistance, MaxDistance, Distance));
-            
-            UpdateCamera();
 
+            // setZoomPercentage(Mathf.InverseLerp(MinDistance, MaxDistance, Distance));
+
+            UpdateCamera();
+            updateZoom();
             if (_dynMethod != null) _dynMethod.Invoke(this, new object[] { });
         }
 
@@ -363,6 +340,37 @@ namespace BetterPerspective
             JumpTo(toGameObject.transform.position, snap);
         }
 
+        public new float getZoomPercentage()
+        {
+            return Mathf.InverseLerp(this.MinDistance, this.MaxDistance, this.Distance);
+        }
+
+        private new void updateZoom()
+        {
+            updateAudioMix();
+            updateTiltShift();
+        }
+
+        public new void updateAudioMix()
+        {
+            if (AudioController.Instance != null)
+            {
+                AudioController.Instance.setZoomLevel(getZoomPercentage());
+            }
+        }
+
+        public new void updateTiltShift()
+        {
+            if (_tiltShift != null)
+            {
+                float num = 1f - getZoomPercentage();
+                float graphicsTiltShiftIntensity = Settings.Instance.graphicsTiltShiftIntensity;
+                float num2 = Mathf.Lerp(graphicsTiltShiftIntensity * 0.3f, graphicsTiltShiftIntensity, num * num * num);
+                _tiltShift.enabled = (num2 > 0f);
+                _tiltShift.Area = num2;
+            }
+        }
+
 
         public void Follow(Transform followTarget, bool snap)
         {
@@ -390,103 +398,8 @@ namespace BetterPerspective
             }
         }
 
-        public Rect windowRect = new Rect(5, 70, 250, 400);
         private MethodInfo _dynMethod;
 
-        void OnGUI()
-        {
-            if (ShowSettings)
-            {
-                windowRect = GUI.Window(0, windowRect, DoMyWindow, "Camera Settings");
-            }
-        }
-
-        void DoMyWindow(int windowID)
-        {
-            GUI.DragWindow(new Rect(0, 0, 10000, 20));
-            Smoothing = GUILayout.Toggle(Smoothing, "Smooth");
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Smoothness:");
-            Smoothness = GUILayout.HorizontalSlider(Smoothness, 10.0F, 1f);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Move Speed:");
-            KeysScript.MoveSpeedVar = GUILayout.HorizontalSlider(KeysScript.MoveSpeedVar, 1.0F, 40.0f);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Rotate Speed:");
-            MouseScript.RotateSpeedVar = GUILayout.HorizontalSlider(MouseScript.RotateSpeedVar, 150F, 570F);
-            KeysScript.RotateSpeedVar = MouseScript.RotateSpeedVar - 100f;
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Zoom Speed:");
-            MouseScript.ZoomSpeedVar = GUILayout.HorizontalSlider(MouseScript.ZoomSpeedVar, 1f, 30f);
-            KeysScript.ZoomSpeedVar = MouseScript.ZoomSpeedVar;
-            GUILayout.EndHorizontal();
-
-            //camera.nearClipPlane = GUILayout.HorizontalSlider(camera.nearClipPlane, 0f, 1500f);
-            //GUILayout.BeginHorizontal();
-            //GUILayout.Label("Drawing distance:");
-            //camera.farClipPlane = GUILayout.HorizontalSlider(camera.farClipPlane, 10f, 1500f);
-            //RenderSettings.fogEndDistance = camera.farClipPlane;
-            //RenderSettings.fogStartDistance = camera.farClipPlane - 10f;
-
-
-            //GUILayout.EndHorizontal();
-            string[] names = QualitySettings.names;
-            GUILayout.FlexibleSpace();
-
-            GUILayout.BeginVertical();
-            GUILayout.Label("Quality Settings:");
-            int i = 0;
-            while (i < names.Length)
-            {
-                if (GUILayout.Button(names[i]))
-                    QualitySettings.SetQualityLevel(i, true);
-
-                i++;
-            }
-
-            GUILayout.EndVertical();
-
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Default Settings"))
-            {
-                Reset();
-                KeysScript.Reset();
-                MouseScript.Reset();
-            }
-
-            GUILayout.Label("Press P to Toggle this window");
-        }
-
-        void OnDisable()
-        {
-            Save();
-        }
-
-        void Save()
-        {
-            PlayerPrefs.SetInt("Smooth", Convert.ToInt32(Smoothing));
-            PlayerPrefs.SetFloat("Smoothness", Smoothness);
-            PlayerPrefs.SetFloat("MoveSpeedVar", KeysScript.MoveSpeedVar);
-            PlayerPrefs.SetFloat("RotateSpeedVar", MouseScript.RotateSpeedVar);
-            PlayerPrefs.SetFloat("ZoomSpeedVar", MouseScript.ZoomSpeedVar);
-            PlayerPrefs.SetFloat("viewDistance", camera.farClipPlane);
-        }
-
-        void Load()
-        {
-            Smoothing = Convert.ToBoolean(PlayerPrefs.GetInt("Smooth"));
-            Smoothness = PlayerPrefs.GetFloat("Smoothness");
-            KeysScript.MoveSpeedVar = PlayerPrefs.GetFloat("MoveSpeedVar");
-            MouseScript.RotateSpeedVar = PlayerPrefs.GetFloat("RotateSpeedVar");
-            MouseScript.ZoomSpeedVar = PlayerPrefs.GetFloat("ZoomSpeedVar");
-            //camera.farClipPlane = PlayerPrefs.GetFloat("viewDistance", 50f);
-        }
 
         public void Follow(GameObject followTarget, bool snap)
         {
@@ -535,9 +448,9 @@ namespace BetterPerspective
             var v = new Vector3(0.0f, 0.0f, -_currDistance);
             var position = rotation * v + _target.transform.position;
 
-            if (camera.orthographic)
+            if (Camera.orthographic)
             {
-                camera.orthographicSize = _currDistance;
+                Camera.orthographicSize = _currDistance;
             }
 
 
@@ -607,56 +520,5 @@ namespace BetterPerspective
             var sign = (Vector3.Dot(v, Vector3.right) > 0.0f) ? 1.0f : -1.0f;
             _currRotation = Rotation = 180f + (sign * angle) + FollowRotationOffset;
         }
-        
-        IEnumerator Wait(float waitTimeDelete)
-        {
-            yield return new WaitForSeconds(waitTimeDelete);
-            foreach (CameraController CC in Camera.main.transform.GetComponents<CameraController>())
-            {
-                if (CC != this)
-                {
-                    CC.enabled = false;
-                }
-            }
-        }
-        
-
-        void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-
-
-            Gizmos.DrawWireSphere(MaxBounds, 3);
-            Gizmos.DrawWireSphere(MinBounds, 3);
-
-            Gizmos.DrawLine(MaxBounds, new Vector3(MinBounds.x, MaxBounds.y, MaxBounds.z));
-            Gizmos.DrawLine(MaxBounds, new Vector3(MaxBounds.x, MinBounds.y, MaxBounds.z));
-            Gizmos.DrawLine(MaxBounds, new Vector3(MaxBounds.x, MaxBounds.y, MinBounds.z));
-
-            Gizmos.DrawLine(new Vector3(MinBounds.x, MaxBounds.y, MaxBounds.z),
-                new Vector3(MinBounds.x, MaxBounds.y, MinBounds.z));
-            Gizmos.DrawLine(new Vector3(MaxBounds.x, MaxBounds.y, MinBounds.z),
-                new Vector3(MinBounds.x, MaxBounds.y, MinBounds.z));
-
-            Gizmos.DrawLine(new Vector3(MinBounds.x, MinBounds.y, MaxBounds.z),
-                new Vector3(MinBounds.x, MinBounds.y, MinBounds.z));
-            Gizmos.DrawLine(new Vector3(MaxBounds.x, MinBounds.y, MinBounds.z),
-                new Vector3(MinBounds.x, MinBounds.y, MinBounds.z));
-
-
-            Gizmos.DrawLine(new Vector3(MaxBounds.x, MinBounds.y, MinBounds.z),
-                new Vector3(MaxBounds.x, MinBounds.y, MaxBounds.z));
-            Gizmos.DrawLine(new Vector3(MinBounds.x, MinBounds.y, MaxBounds.z),
-                new Vector3(MaxBounds.x, MinBounds.y, MaxBounds.z));
-
-            Gizmos.DrawLine(new Vector3(MaxBounds.x, MinBounds.y, MinBounds.z),
-                new Vector3(MaxBounds.x, MaxBounds.y, MinBounds.z));
-            Gizmos.DrawLine(new Vector3(MinBounds.x, MinBounds.y, MaxBounds.z),
-                new Vector3(MinBounds.x, MaxBounds.y, MaxBounds.z));
-
-            Gizmos.DrawLine(MinBounds, new Vector3(MinBounds.x, MaxBounds.y, MinBounds.z));
-        }
-
-         
     }
 }

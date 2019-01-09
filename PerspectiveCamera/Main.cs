@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using PerspectiveCamera;
 
 namespace BetterPerspective
 {
-    public class Main : IMod
+    public class Main : IMod, IModSettings
     {
         CameraHandler cameraHandler;
 
@@ -16,19 +17,20 @@ namespace BetterPerspective
 
         public void onEnabled()
         {
+            PerspectiveCameraSettings.Instance.Load();
             EventManager.Instance.OnStartPlayingPark += InstanceOnOnStartPlayingPark;
         }
 
         private void InstanceOnOnStartPlayingPark()
         {
-            GameObject cameraHandlerGO = new GameObject("CameraHandler");
+            GameObject cameraHandlerGO = new GameObject(Identifier + " | Camera Handler");
             cameraHandler = cameraHandlerGO.AddComponent<CameraHandler>();
             
 
             cameraHandler.origCamera = Camera.main.gameObject;
             cameraHandler.perspectiveCamera = Object.Instantiate(cameraHandler.origCamera);
-            cameraHandler.perspectiveCamera.name = "Perspective Camera";
-
+            cameraHandler.perspectiveCamera.name = Identifier;
+            
 
             cameraHandler.origCamera.SetActive(false);
 
@@ -44,11 +46,15 @@ namespace BetterPerspective
             cam.fieldOfView = cam2.fieldOfView;
 
             Object.DestroyImmediate(cam.gameObject.GetComponent<CameraController>());
-            Camera.main.gameObject.AddComponent<BetterPerspectiveCamera>();
-            Camera.main.gameObject.AddComponent<BetterPerspectiveCameraKeys>();
-            Camera.main.gameObject.AddComponent<BetterPerspectiveCameraMouse>();
+            Camera.main.gameObject.AddComponent<PerspectiveCamera.PerspectiveCamera>();
+            Camera.main.gameObject.AddComponent<PerspectiveCameraKeys>();
+            Camera.main.gameObject.AddComponent<PerspectiveCameraMouse>();
             Object.Destroy(go);
+
+            cameraHandler.SetCameraActive(cameraHandler.perspectiveCamera);
         }
+
+        
 
         public void onDisabled()
         {
@@ -65,20 +71,31 @@ namespace BetterPerspective
             InputManager.Instance.registerKeyGroup(group);
 
             //Options
-            RegisterKey("setting", KeyCode.P, "Open camera Settings",
-                "Use this key to open the camera settings panel (only when perspective camera is active)");
             RegisterKey("switchMode", KeyCode.F10, "Switch camera",
-                "Use this key to quicly switch between the default game camera & the perspective camera");
+                "Use this key to quickly switch between the default game camera & the perspective camera");
         }
 
-        private KeyMapping RegisterKey(string identifier, KeyCode keyCode, string Name, string Description = "")
+        private void RegisterKey(string identifier, KeyCode keyCode, string Name, string Description = "")
         {
             KeyMapping key = new KeyMapping(Identifier + "/" + identifier, keyCode, KeyCode.None);
             key.keyGroupIdentifier = Identifier;
             key.keyName = Name;
             key.keyDescription = Description;
             InputManager.Instance.registerKeyMapping(key);
-            return key;
+        }
+
+        public void onDrawSettingsUI()
+        {
+            PerspectiveCameraSettingsUI.DrawGUI();
+        }
+
+        public void onSettingsOpened()
+        {
+        }
+
+        public void onSettingsClosed()
+        {
+            PerspectiveCameraSettings.Instance.Save();
         }
 
         public string Name => name;

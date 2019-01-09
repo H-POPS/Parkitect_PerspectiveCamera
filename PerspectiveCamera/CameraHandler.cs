@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Moona;
+using Parkitect.UI;
 using UnityEngine;
 
 namespace BetterPerspective
@@ -22,6 +25,22 @@ namespace BetterPerspective
             Settings.Instance.changeAntiAliasing(Settings.Instance.antiAliasing);
             GameController.Instance.cameraController = cameraGO.GetComponent<CameraController>();
             CullingGroupManager.Instance.setTargetCamera(cameraGO.GetComponent<Camera>());
+
+            var field = typeof(MFlatPanning).GetField("_cam",
+                BindingFlags.Static |
+                BindingFlags.NonPublic);
+            // Normally the first argument to "SetValue" is the instance
+            // of the type but since we are mutating a static field we pass "null"
+            if (field != null) field.SetValue(null, cameraGO.GetComponent<Camera>());
+
+            if (perspectiveCamera.activeSelf)
+            {
+                GameController.Instance.pushCameraControlLock();
+            }
+            else
+            {
+                GameController.Instance.popCameraControlLock();
+            }
         }
 
         void ToggleCamera()
@@ -29,11 +48,9 @@ namespace BetterPerspective
             if (!perspectiveCamera.activeSelf)
             {
                 SetCameraActive(perspectiveCamera);
-                GameController.Instance.pushCameraControlLock();
             }
             else
             {
-                GameController.Instance.popCameraControlLock();
                 SetCameraActive(origCamera);
             }
         }

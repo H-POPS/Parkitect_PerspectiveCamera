@@ -224,6 +224,12 @@
     <Reference Include="UnityEngine.WindModule">
       <HintPath>$(ParkitectPath)/Parkitect_Data\Managed\UnityEngine.WindModule.dll</HintPath>
     </Reference>
+    <Reference Include="ThirdParty.TiltShift.dll">
+      <HintPath>$(ParkitectPath)/Parkitect_Data\Managed\ThirdParty.TiltShift.dll</HintPath>
+    </Reference>
+    <Reference Include="ThirdParty.dll">
+      <HintPath>$(ParkitectPath)/Parkitect_Data\Managed\ThirdParty.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
