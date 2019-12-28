@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PerspectiveCamera
 {
-    class PerspectiveCameraMouse : MonoBehaviour
+    internal class PerspectiveCameraMouse : MonoBehaviour
     {
         public KeyCode MouseOrbitButton;
 
@@ -80,8 +80,8 @@ namespace PerspectiveCamera
 
 
                 MoveSpeed = 20f;
-                var RotateSpeed = PerspectiveCameraSettings.Instance.RotateSpeed;
-                var ZoomSpeed = PerspectiveCameraSettings.Instance.ZoomSpeed;
+                var rotateSpeed = PerspectiveCameraSettings.Instance.RotateSpeed;
+                var zoomSpeed = PerspectiveCameraSettings.Instance.ZoomSpeed;
                 TiltSpeed = TiltSpeedVar;
                 PanSpeed = PanSpeedVar;
 
@@ -92,7 +92,7 @@ namespace PerspectiveCamera
                 if (AllowZoom && !UIUtility.isMouseOverUIElement())
                 {
                     var scroll = -Input.GetAxisRaw(ZoomInputAxis);
-                    _camera.Distance -= scroll * ZoomSpeed * num * distanceMultiplier;
+                    _camera.Distance -= scroll * zoomSpeed * num * distanceMultiplier;
                 }
 
                 if (Input.GetKey(MouseOrbitButton))
@@ -120,7 +120,7 @@ namespace PerspectiveCamera
                         if (AllowRotate)
                         {
                             var rot = Input.GetAxisRaw(RotateInputAxis);
-                            _camera.Rotation += rot * RotateSpeed * num;
+                            _camera.Rotation += rot * rotateSpeed * num;
                         }
                     }
                 }

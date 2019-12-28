@@ -1,14 +1,12 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
-using PerspectiveCamera;
+using UnityEngine;
 
-namespace BetterPerspective
+namespace PerspectiveCamera
 {
     public class Main : IMod, IModSettings
     {
-        CameraHandler cameraHandler;
+        private CameraHandler _cameraHandler;
 
         public Main()
         {
@@ -23,44 +21,40 @@ namespace BetterPerspective
 
         private void InstanceOnOnStartPlayingPark()
         {
-            GameObject cameraHandlerGO = new GameObject(Identifier + " | Camera Handler");
-            cameraHandler = cameraHandlerGO.AddComponent<CameraHandler>();
+            GameObject cameraHandlerGo = new GameObject(Identifier + " | Camera Handler");
+            _cameraHandler = cameraHandlerGo.AddComponent<CameraHandler>();
             
 
-            cameraHandler.origCamera = Camera.main.gameObject;
-            cameraHandler.perspectiveCamera = Object.Instantiate(cameraHandler.origCamera);
-            cameraHandler.perspectiveCamera.name = Identifier;
+            _cameraHandler.OrigCamera = Camera.main.gameObject;
+            _cameraHandler.PerspectiveCamera = Object.Instantiate(_cameraHandler.OrigCamera);
+            _cameraHandler.PerspectiveCamera.name = Identifier;
             
 
-            cameraHandler.origCamera.SetActive(false);
+            _cameraHandler.OrigCamera.SetActive(false);
 
             GameObject go = new GameObject();
             Camera cam2 = go.AddComponent<Camera>();
 
-            Camera cam = cameraHandler.perspectiveCamera.GetComponent<Camera>();
+            Camera cam = _cameraHandler.PerspectiveCamera.GetComponent<Camera>();
 
-
-            /**
-            * Ugliest code of all time, but hey, it works!
-            */
             cam.fieldOfView = cam2.fieldOfView;
 
             Object.DestroyImmediate(cam.gameObject.GetComponent<CameraController>());
-            Camera.main.gameObject.AddComponent<PerspectiveCamera.PerspectiveCamera>();
+            Camera.main.gameObject.AddComponent<global::PerspectiveCamera.PerspectiveCamera>();
             Camera.main.gameObject.AddComponent<PerspectiveCameraKeys>();
             Camera.main.gameObject.AddComponent<PerspectiveCameraMouse>();
             Object.Destroy(go);
 
-            cameraHandler.SetCameraActive(cameraHandler.perspectiveCamera);
+            _cameraHandler.SetCameraActive(_cameraHandler.PerspectiveCamera);
         }
 
         
 
         public void onDisabled()
         {
-            cameraHandler.SetCameraActive(cameraHandler.origCamera);
-            Object.DestroyImmediate(cameraHandler.perspectiveCamera);
-            Object.DestroyImmediate(cameraHandler.gameObject);
+            _cameraHandler.SetCameraActive(_cameraHandler.OrigCamera);
+            Object.DestroyImmediate(_cameraHandler.PerspectiveCamera);
+            Object.DestroyImmediate(_cameraHandler.gameObject);
         }
 
         private void SetupKeyBinding()
@@ -73,20 +67,25 @@ namespace BetterPerspective
             //Options
             RegisterKey("switchMode", KeyCode.F10, "Switch camera",
                 "Use this key to quickly switch between the default game camera & the perspective camera");
+
+            //Options
+            RegisterKey("CameraTiltUp", KeyCode.R, "Tilt Camera Up");
+            //Options
+            RegisterKey("CameraTiltDown", KeyCode.F, "Tilt Camera Up");
         }
 
-        private void RegisterKey(string identifier, KeyCode keyCode, string Name, string Description = "")
+        private void RegisterKey(string identifier, KeyCode keyCode, string name, string description = "")
         {
-            KeyMapping key = new KeyMapping(Identifier + "/" + identifier, keyCode, KeyCode.None);
+            var key = new KeyMapping(Identifier + "/" + identifier, keyCode, KeyCode.None);
             key.keyGroupIdentifier = Identifier;
-            key.keyName = Name;
-            key.keyDescription = Description;
+            key.keyName = name;
+            key.keyDescription = description;
             InputManager.Instance.registerKeyMapping(key);
         }
 
         public void onDrawSettingsUI()
         {
-            PerspectiveCameraSettingsUI.DrawGUI();
+            PerspectiveCameraSettingsUi.DrawGui();
         }
 
         public void onSettingsOpened()
@@ -98,11 +97,11 @@ namespace BetterPerspective
             PerspectiveCameraSettings.Instance.Save();
         }
 
-        public string Name => name;
-        public string Description => description;
-        public string Identifier => identifier;
+        public string Name => _name;
+        public string Description => _description;
+        public string Identifier => _identifier;
 
-        private static string name, description, identifier;
+        private static string _name, _description, _identifier;
 
 
         static Main()
@@ -113,12 +112,12 @@ namespace BetterPerspective
                 assembly.GetCustomAttributes(typeof(AssemblyMetadataAttribute), false)
                     .Cast<AssemblyMetadataAttribute>()
                     .Single(a => a.Key == "Identifier");
-            identifier = meta.Value;
+            _identifier = meta.Value;
 
             T GetAssemblyAttribute<T>() where T : System.Attribute => (T) assembly.GetCustomAttribute(typeof(T));
 
-            name = GetAssemblyAttribute<AssemblyTitleAttribute>().Title;
-            description = GetAssemblyAttribute<AssemblyDescriptionAttribute>().Description;
+            _name = GetAssemblyAttribute<AssemblyTitleAttribute>().Title;
+            _description = GetAssemblyAttribute<AssemblyDescriptionAttribute>().Description;
             
         }
     }

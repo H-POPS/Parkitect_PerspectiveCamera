@@ -1,16 +1,15 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace PerspectiveCamera
 {
-    public static class PerspectiveCameraSettingsUI
+    public static class PerspectiveCameraSettingsUi
     {
-        public static void DrawGUI()
+        public static void DrawGui()
         {
+            GUILayout.BeginVertical();
             var settings = PerspectiveCameraSettings.Instance;
             settings.Smoothing = GUILayout.Toggle(settings.Smoothing, "Smooth");
 
-            GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             GUILayout.Label("Smoothness:");
             settings.Smoothness = GUILayout.HorizontalSlider(settings.Smoothness, 10.0F, 1f);

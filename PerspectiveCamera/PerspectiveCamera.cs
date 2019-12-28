@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Reflection;
+using Parkitect.UI;
 using PostFX;
 using UnityEngine;
 
@@ -97,7 +97,6 @@ namespace PerspectiveCamera
             MaxTilt = 85f;
             TiltDampening = 5f;
 
-
             FollowBehind = false;
             FollowRotationOffset = 0;
         }
@@ -126,17 +125,6 @@ namespace PerspectiveCamera
                 GetComponent<Rigidbody>().freezeRotation = true;
 
 
-            _initialLookAt = LookAt;
-            _initialDistance = Distance;
-            _initialRotation = Rotation;
-            _initialTilt = Tilt;
-
-
-            _currDistance = Distance;
-            _currRotation = Rotation;
-            _currTilt = Tilt;
-
-
             CreateTarget();
             Park park = GameController.Instance.park;
             MaxBounds = new Vector3(park.xSize - .6f, park.ySize, park.zSize - .6f);
@@ -145,6 +133,20 @@ namespace PerspectiveCamera
 
 
             EventManager.Instance.OnNightModeChanged += Instance_OnNightModeChanged;
+
+            if (park.parkEntrances.Count > 0)
+            {
+                LookAt = park.parkEntrances[0].transform.position;
+            }
+
+            _initialLookAt = LookAt;
+            _initialDistance = Distance;
+            _initialRotation = Rotation;
+            _initialTilt = Tilt;
+
+            _currDistance = Distance;
+            _currRotation = Rotation;
+            _currTilt = Tilt;
         }
 
         private void Instance_OnNightModeChanged(bool isNightMode)
@@ -162,7 +164,7 @@ namespace PerspectiveCamera
 
         public new void eventUpdate()
         {
-            Park park = GameController.Instance.park;
+            var park = GameController.Instance.park;
             MaxBounds = new Vector3(park.xSize - .6f, park.ySize, park.zSize - .6f);
             if (Input.GetKeyUp(Settings.Instance.getKeyMapping("H-POPS@PerspectiveCamera/setting")))
             {
@@ -205,7 +207,6 @@ namespace PerspectiveCamera
 
             AdaptFarClipPaneToFps();
             LUpdate();
-//            InternalEventManager.Instance.RaiseOnZoomLevelChanged(getZoomPercentage());
         }
 
 
@@ -231,7 +232,13 @@ namespace PerspectiveCamera
             {
                 _moveVector.y = 0;
                 LookAt += Quaternion.Euler(0, Rotation, 0) * _moveVector;
-                LookAt.y = GetHeightAt(LookAt.x, LookAt.z);
+
+                var tool = GameController.Instance.getActiveMouseTool();
+
+                if (tool == null || tool.GetType() != typeof(Terraformer) || !Input.GetMouseButton(0))
+                    LookAt.y = GetHeightAt(LookAt.x, LookAt.z);
+                else
+                    LookAt.y -= LookAtHeightOffset; 
             }
 
             LookAt.y += LookAtHeightOffset;
@@ -274,7 +281,7 @@ namespace PerspectiveCamera
             // setZoomPercentage(Mathf.InverseLerp(MinDistance, MaxDistance, Distance));
 
             UpdateCamera();
-            updateZoom();
+            UpdateZoom();
             if (_dynMethod != null) _dynMethod.Invoke(this, new object[] { });
         }
 
@@ -340,30 +347,30 @@ namespace PerspectiveCamera
             JumpTo(toGameObject.transform.position, snap);
         }
 
-        public new float getZoomPercentage()
+        public new float GetZoomPercentage()
         {
             return Mathf.InverseLerp(this.MinDistance, this.MaxDistance, this.Distance);
         }
 
-        private new void updateZoom()
+        private new void UpdateZoom()
         {
-            updateAudioMix();
-            updateTiltShift();
+            UpdateAudioMix();
+            UpdateTiltShift();
         }
 
-        public new void updateAudioMix()
+        public new void UpdateAudioMix()
         {
             if (AudioController.Instance != null)
             {
-                AudioController.Instance.setZoomLevel(getZoomPercentage());
+                AudioController.Instance.setZoomLevel(GetZoomPercentage());
             }
         }
 
-        public new void updateTiltShift()
+        public new void UpdateTiltShift()
         {
             if (_tiltShift != null)
             {
-                float num = 1f - getZoomPercentage();
+                float num = 1f - GetZoomPercentage();
                 float graphicsTiltShiftIntensity = Settings.Instance.graphicsTiltShiftIntensity;
                 float num2 = Mathf.Lerp(graphicsTiltShiftIntensity * 0.3f, graphicsTiltShiftIntensity, num * num * num);
                 _tiltShift.enabled = (num2 > 0f);

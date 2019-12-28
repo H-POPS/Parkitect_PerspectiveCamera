@@ -18,34 +18,11 @@ namespace PerspectiveCamera
         public bool AllowTilt;
         public float TiltSpeed;
 
-        public KeyCode ResetKey;
         public bool IncludePositionOnReset;
 
         public bool MovementBreaksFollow;
 
-        public string HorizontalInputAxis = "Horizontal";
-        public string VerticalInputAxis = "Vertical";
-
-        public bool RotateUsesInputAxis = false;
-        public string RotateInputAxis = "KbCameraRotate";
-        public KeyCode RotateLeftKey = KeyCode.Q;
-        public KeyCode RotateRightKey = KeyCode.E;
-
-        public bool ZoomUsesInputAxis = false;
-        public string ZoomInputAxis = "KbCameraZoom";
-        public KeyCode ZoomOutKey = KeyCode.Z;
-        public KeyCode ZoomInKey = KeyCode.X;
-
-        public bool TiltUsesInputAxis = false;
-        public string TiltInputAxis = "KbCameraTilt";
-        public KeyCode TiltUpKey = KeyCode.R;
-        public KeyCode TiltDownKey = KeyCode.F;
-
-        //
-
         private PerspectiveCamera _camera;
-
-        //
 
         public void Reset()
         {
@@ -57,13 +34,11 @@ namespace PerspectiveCamera
             FastMoveKeyCode2 = KeyCode.RightShift;
 
             AllowRotate = true;
-
             AllowZoom = true;
-
             AllowTilt = true;
-            TiltSpeed = 90f;
 
-            ResetKey = KeyCode.Home;
+            TiltSpeed = 45f;
+
             IncludePositionOnReset = true;
 
             MovementBreaksFollow = true;
@@ -78,9 +53,9 @@ namespace PerspectiveCamera
         {
             try
             {
-                float num = 0.02f;
-                float distanceMultiplier = _camera.Distance * 7 / _camera.MaxDistance + 0.1f;
-                float distanceModifier = Mathf.Sqrt(_camera.Distance / _camera.MaxDistance) * 2;
+                var num = 0.02f;
+                var distanceMultiplier = _camera.Distance * 7 / _camera.MaxDistance + 0.1f;
+                var distanceModifier = Mathf.Sqrt(_camera.Distance / _camera.MaxDistance) * 2;
 
                 var moveSpeed = PerspectiveCameraSettings.Instance.MoveSpeed;
                 FastMoveSpeed = moveSpeed * 2;
@@ -101,14 +76,14 @@ namespace PerspectiveCamera
                         speed = FastMoveSpeed;
                     }
 
-                    var h = Input.GetAxisRaw(HorizontalInputAxis);
+                    var h = InputManager.getAxisRaw("CameraMoveLeft", "CameraMoveRight");
                     if (Mathf.Abs(h) > 0.001f)
                     {
                         hasMovement = true;
                         _camera.AddToPosition(h * speed * num * distanceModifier, 0, 0);
                     }
 
-                    var v = Input.GetAxisRaw(VerticalInputAxis);
+                    var v = InputManager.getAxisRaw("CameraMoveDown", "CameraMoveUp");
                     if (Mathf.Abs(v) > 0.001f)
                     {
                         hasMovement = true;
@@ -122,82 +97,21 @@ namespace PerspectiveCamera
 
                 if (AllowRotate)
                 {
-                    if (RotateUsesInputAxis)
-                    {
-                        var rot = Input.GetAxisRaw(RotateInputAxis);
-                        if (Mathf.Abs(rot) > 0.001f)
-                        {
-                            _camera.Rotation += rot * rotateSpeed * num;
-                        }
-                    }
-                    else
-                    {
-                        if (Input.GetKey(RotateLeftKey))
-                        {
-                            _camera.Rotation += rotateSpeed * num;
-                        }
+                    var r = InputManager.getAxisRaw("CameraRotateRight", "CameraRotateLeft");
+                    _camera.Rotation += r * rotateSpeed * num;
 
-                        if (Input.GetKey(RotateRightKey))
-                        {
-                            _camera.Rotation -= rotateSpeed * num;
-                        }
-                    }
                 }
 
                 if (AllowZoom)
                 {
-                    if (ZoomUsesInputAxis)
-                    {
-                        var zoom = Input.GetAxisRaw(ZoomInputAxis);
-                        if (Mathf.Abs(zoom) > 0.001f)
-                        {
-                            _camera.Distance += zoom * zoomSpeed * num * distanceMultiplier;
-                        }
-                    }
-                    else
-                    {
-                        if (Input.GetKey(ZoomOutKey))
-                        {
-                            _camera.Distance += zoomSpeed * num * distanceMultiplier;
-                        }
-
-                        if (Input.GetKey(ZoomInKey))
-                        {
-                            _camera.Distance -= zoomSpeed * num * distanceMultiplier;
-                        }
-                    }
+                    var z = InputManager.getAxisRaw("CameraZoomIn", "CameraZoomOut");
+                    _camera.Distance += z * zoomSpeed * num * distanceMultiplier;
                 }
 
                 if (AllowTilt)
                 {
-                    if (TiltUsesInputAxis)
-                    {
-                        var tilt = Input.GetAxisRaw(TiltInputAxis);
-                        if (Mathf.Abs(tilt) > 0.001f)
-                        {
-                            _camera.Tilt += tilt * TiltSpeed * num;
-                        }
-                    }
-                    else
-                    {
-                        if (Input.GetKey(TiltUpKey))
-                        {
-                            _camera.Tilt += TiltSpeed * num;
-                        }
-
-                        if (Input.GetKey(TiltDownKey))
-                        {
-                            _camera.Tilt -= TiltSpeed * num;
-                        }
-                    }
-                }
-
-                if (ResetKey != KeyCode.None)
-                {
-                    if (Input.GetKeyDown(ResetKey))
-                    {
-                        _camera.ResetToInitialValues(IncludePositionOnReset, false);
-                    }
+                    var t = InputManager.getAxisRaw("H-POPS@PerspectiveCamera/CameraTiltDown", "H-POPS@PerspectiveCamera/CameraTiltUp");
+                    _camera.Tilt += t * TiltSpeed * num;
                 }
             }
             catch (Exception e)
