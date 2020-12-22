@@ -4,8 +4,15 @@ using UnityEngine;
 
 namespace PerspectiveCamera
 {
-    public class Main : IMod, IModSettings
+    public class Main : AbstractMod, IModSettings
     {
+        public override string getName() => "Perspective Camera";
+        public override string getDescription() => "Perspective camera for your game";
+        public override string getVersionNumber() => "1.0.1 (Multiplayer support)";
+        public override string getIdentifier() => "H-POPS@PerspectiveCamera";
+        public override bool isMultiplayerModeCompatible() => true;
+        public override bool isRequiredByAllPlayersInMultiplayerMode() => false;
+
         private CameraHandler _cameraHandler;
 
         public Main()
@@ -13,7 +20,7 @@ namespace PerspectiveCamera
             SetupKeyBinding();
         }
 
-        public void onEnabled()
+        public override void onEnabled()
         {
             PerspectiveCameraSettings.Instance.Load();
             EventManager.Instance.OnStartPlayingPark += InstanceOnOnStartPlayingPark;
@@ -21,13 +28,13 @@ namespace PerspectiveCamera
 
         private void InstanceOnOnStartPlayingPark()
         {
-            GameObject cameraHandlerGo = new GameObject(Identifier + " | Camera Handler");
+            GameObject cameraHandlerGo = new GameObject(getIdentifier() + " | Camera Handler");
             _cameraHandler = cameraHandlerGo.AddComponent<CameraHandler>();
             
 
             _cameraHandler.OrigCamera = Camera.main.gameObject;
             _cameraHandler.PerspectiveCamera = Object.Instantiate(_cameraHandler.OrigCamera);
-            _cameraHandler.PerspectiveCamera.name = Identifier;
+            _cameraHandler.PerspectiveCamera.name = getIdentifier();
             
 
             _cameraHandler.OrigCamera.SetActive(false);
@@ -59,8 +66,8 @@ namespace PerspectiveCamera
 
         private void SetupKeyBinding()
         {
-            KeyGroup group = new KeyGroup(Identifier);
-            group.keyGroupName = Name;
+            KeyGroup group = new KeyGroup(getIdentifier());
+            group.keyGroupName = getName();
 
             InputManager.Instance.registerKeyGroup(group);
 
@@ -76,8 +83,8 @@ namespace PerspectiveCamera
 
         private void RegisterKey(string identifier, KeyCode keyCode, string name, string description = "")
         {
-            var key = new KeyMapping(Identifier + "/" + identifier, keyCode, KeyCode.None);
-            key.keyGroupIdentifier = Identifier;
+            var key = new KeyMapping(getIdentifier() + "/" + identifier, keyCode, KeyCode.None);
+            key.keyGroupIdentifier = getIdentifier();
             key.keyName = name;
             key.keyDescription = description;
             InputManager.Instance.registerKeyMapping(key);
@@ -97,28 +104,5 @@ namespace PerspectiveCamera
             PerspectiveCameraSettings.Instance.Save();
         }
 
-        public string Name => _name;
-        public string Description => _description;
-        public string Identifier => _identifier;
-
-        private static string _name, _description, _identifier;
-
-
-        static Main()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            var meta =
-                assembly.GetCustomAttributes(typeof(AssemblyMetadataAttribute), false)
-                    .Cast<AssemblyMetadataAttribute>()
-                    .Single(a => a.Key == "Identifier");
-            _identifier = meta.Value;
-
-            T GetAssemblyAttribute<T>() where T : System.Attribute => (T) assembly.GetCustomAttribute(typeof(T));
-
-            _name = GetAssemblyAttribute<AssemblyTitleAttribute>().Title;
-            _description = GetAssemblyAttribute<AssemblyDescriptionAttribute>().Description;
-            
-        }
     }
 }
