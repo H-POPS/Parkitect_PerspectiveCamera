@@ -10,6 +10,9 @@ namespace PerspectiveCamera
         public float MoveSpeed = 15f;
         public float RotateSpeed = 360f;
         public float ZoomSpeed = 5f;
+        public int TargetFrameRate = 60;
+        public int RenderDistance = 180;
+        public bool FollowTerrain = true;
 
         public void Reset()
         {
@@ -18,6 +21,9 @@ namespace PerspectiveCamera
             MoveSpeed = 15f;
             RotateSpeed = 360f;
             ZoomSpeed = 5f;
+            TargetFrameRate = 60;
+            RenderDistance = 180;
+            FollowTerrain = true;
         }
 
         public void Save()
@@ -27,6 +33,9 @@ namespace PerspectiveCamera
             PlayerPrefs.SetFloat("MoveSpeed", MoveSpeed);
             PlayerPrefs.SetFloat("RotateSpeed", RotateSpeed);
             PlayerPrefs.SetFloat("ZoomSpeed", ZoomSpeed);
+            PlayerPrefs.SetInt("TargetFrameRate", TargetFrameRate);
+            PlayerPrefs.SetInt("RenderDistance", RenderDistance);
+            PlayerPrefs.SetInt("FollowTerrain", Convert.ToInt32(FollowTerrain));
         }
 
         public void Load()
@@ -38,6 +47,18 @@ namespace PerspectiveCamera
                 MoveSpeed = PlayerPrefs.GetFloat("MoveSpeed");
                 RotateSpeed = PlayerPrefs.GetFloat("RotateSpeed");
                 ZoomSpeed = PlayerPrefs.GetFloat("ZoomSpeed");
+            }
+            if (PlayerPrefs.HasKey("FollowTerrain"))
+            {
+                FollowTerrain = Convert.ToBoolean(PlayerPrefs.GetInt("FollowTerrain"));
+            }
+            if (PlayerPrefs.HasKey("TargetFrameRate"))
+            {
+                TargetFrameRate = PlayerPrefs.GetInt("TargetFrameRate");
+            }
+            if (PlayerPrefs.HasKey("RenderDistance"))
+            {
+                RenderDistance = PlayerPrefs.GetInt("RenderDistance");
             }
         }
     }

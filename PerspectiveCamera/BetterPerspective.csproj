@@ -74,6 +74,9 @@
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>$(ParkitectPath)/Parkitect_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ParkitectPath)/Parkitect_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

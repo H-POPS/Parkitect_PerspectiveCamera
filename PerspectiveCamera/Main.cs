@@ -8,7 +8,7 @@ namespace PerspectiveCamera
     {
         public override string getName() => "Perspective Camera";
         public override string getDescription() => "Perspective camera for your game";
-        public override string getVersionNumber() => "1.0.1 (Multiplayer support)";
+        public override string getVersionNumber() => "1.0.2";
         public override string getIdentifier() => "H-POPS@PerspectiveCamera";
         public override bool isMultiplayerModeCompatible() => true;
         public override bool isRequiredByAllPlayersInMultiplayerMode() => false;

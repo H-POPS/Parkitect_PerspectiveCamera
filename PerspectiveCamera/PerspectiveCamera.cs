@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Reflection;
 using Parkitect.UI;
 using PostFX;
@@ -68,12 +69,13 @@ namespace PerspectiveCamera
         public Camera Camera;
         private TiltShift _tiltShift;
 
+        private FieldInfo animatePanToCoroutineField;
+        private FieldInfo cameraFocusPointField;
 
         public void Reset()
         {
             _lastDebugCamera = true;
             LookAtHeightOffset = .2f;
-            TerrainHeightViaPhysics = true;
             TerrainPhysicsLayerMask = 1 << 12;
 
             TargetVisbilityViaPhysics = false;
@@ -147,6 +149,10 @@ namespace PerspectiveCamera
             _currDistance = Distance;
             _currRotation = Rotation;
             _currTilt = Tilt;
+
+            var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            animatePanToCoroutineField = typeof(CameraController).GetField("animatePanToCoroutine", flags);
+            cameraFocusPointField = typeof(CameraController).GetField("cameraFocusPoint", flags);
         }
 
         private void Instance_OnNightModeChanged(bool isNightMode)
@@ -164,6 +170,17 @@ namespace PerspectiveCamera
 
         public new void eventUpdate()
         {
+            // Retrieve the value of the field, and cast as necessary
+            var animatePanToCoroutine = (Coroutine) animatePanToCoroutineField.GetValue(this);
+            if (animatePanToCoroutine != null)
+            {
+                StopCoroutine(animatePanToCoroutine);
+                LookAt = (Vector3) cameraFocusPointField.GetValue(this);
+                animatePanToCoroutineField.SetValue(this, null);
+            }
+
+            _followTarget = lockedOnto?.transform;
+
             var park = GameController.Instance.park;
             MaxBounds = new Vector3(park.xSize - .6f, park.ySize, park.zSize - .6f);
             if (Input.GetKeyUp(Settings.Instance.getKeyMapping("H-POPS@PerspectiveCamera/setting")))
@@ -171,7 +188,7 @@ namespace PerspectiveCamera
                 ShowSettings = !ShowSettings;
             }
 
-            if (Input.GetMouseButton(2) || Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetMouseButton(2))
             {
                 Cursor.visible = false;
                 Cursor.lockState = CursorLockMode.Locked;
@@ -188,10 +205,6 @@ namespace PerspectiveCamera
             RotationDampening = smoothness;
             TiltDampening = smoothness;
 
-            if (lockedOnto != null)
-            {
-                Follow(lockedOnto, false);
-            }
 
 
             if (_lastDebugCamera != ShowDebugCameraTarget)
@@ -205,7 +218,16 @@ namespace PerspectiveCamera
 
             Camera.nearClipPlane = .1f;
 
-            AdaptFarClipPaneToFps();
+
+            if (PerspectiveCameraSettings.Instance.TargetFrameRate <= 0)
+            {
+                Camera.farClipPlane = PerspectiveCameraSettings.Instance.RenderDistance;
+            }
+            else if (Time.timeScale != 0)
+            {
+                AdaptFarClipPaneToFps();
+            }
+
             LUpdate();
         }
 
@@ -213,13 +235,9 @@ namespace PerspectiveCamera
         private void AdaptFarClipPaneToFps()
         {
             var fps = 1.0f / Time.deltaTime;
-
-            if (fps < 50) Camera.farClipPlane = Math.Max(80, Camera.farClipPlane - 30f * Time.deltaTime);
-
-            if (fps > 55) Camera.farClipPlane = Math.Min(260, Camera.farClipPlane + 20f * Time.deltaTime);
+            if (fps < PerspectiveCameraSettings.Instance.TargetFrameRate - 5) Camera.farClipPlane = Math.Max(60, Camera.farClipPlane - 30f * Time.deltaTime);
+            if (fps > PerspectiveCameraSettings.Instance.TargetFrameRate) Camera.farClipPlane = Math.Min(260, Camera.farClipPlane + 20f * Time.deltaTime);
         }
-
-
         protected void LUpdate()
         {
             //camera.farClipPlane = Distance * 1.5f + 100;
@@ -271,12 +289,10 @@ namespace PerspectiveCamera
                 ForceFollowBehind();
             }
 
-
             if (IsFollowing && TargetVisbilityViaPhysics && DistanceToTargetIsLessThan(1f))
             {
                 EnsureTargetIsVisible();
             }
-
 
             // setZoomPercentage(Mathf.InverseLerp(MinDistance, MaxDistance, Distance));
 
@@ -378,31 +394,23 @@ namespace PerspectiveCamera
             }
         }
 
-
+        
         public void Follow(Transform followTarget, bool snap)
         {
             if (_followTarget != null)
             {
-                if (OnEndFollow != null)
-                {
-                    OnEndFollow(_followTarget);
-                }
+                OnEndFollow?.Invoke(_followTarget);
             }
 
             _followTarget = followTarget;
 
-            if (_followTarget != null)
+            if (_followTarget == null) return;
+            if (snap)
             {
-                if (snap)
-                {
-                    LookAt = _followTarget.position;
-                }
-
-                if (OnBeginFollow != null)
-                {
-                    OnBeginFollow(_followTarget);
-                }
+                LookAt = _followTarget.position;
             }
+
+            OnBeginFollow?.Invoke(_followTarget);
         }
 
         private MethodInfo _dynMethod;
@@ -429,7 +437,7 @@ namespace PerspectiveCamera
 
         private float GetHeightAt(float x, float z)
         {
-            if (TerrainHeightViaPhysics)
+            if (PerspectiveCameraSettings.Instance.FollowTerrain)
             {
                 var y = MaxBounds.y;
                 var maxDist = MaxBounds.y - MinBounds.y + 1f;
