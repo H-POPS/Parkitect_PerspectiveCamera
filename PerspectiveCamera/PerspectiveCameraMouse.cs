@@ -72,6 +72,10 @@ namespace PerspectiveCamera
 
         protected void Update()
         {
+            // Without a camera there is nothing to control, and the first lines below would throw on every frame.
+            if (_camera == null)
+                return;
+
             try
             {
                 float num = 0.02f;
@@ -84,10 +88,6 @@ namespace PerspectiveCamera
                 var zoomSpeed = PerspectiveCameraSettings.Instance.ZoomSpeed;
                 TiltSpeed = TiltSpeedVar;
                 PanSpeed = PanSpeedVar;
-
-
-                if (_camera == null)
-                    return;
 
                 if (AllowZoom && !UIUtility.isMouseOverUIElement())
                 {
