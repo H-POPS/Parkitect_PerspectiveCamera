@@ -188,16 +188,7 @@ namespace PerspectiveCamera
                 ShowSettings = !ShowSettings;
             }
 
-            if (Input.GetMouseButton(2))
-            {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-            else
-            {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-            }
+            CursorAnchor.Update(Input.GetMouseButton(2));
 
             var smoothness = PerspectiveCameraSettings.Instance.Smoothness;
             MoveDampening = smoothness;
