@@ -51,6 +51,10 @@ namespace PerspectiveCamera
 
         protected void Update()
         {
+            // Without a camera there is nothing to control, and the first lines below would throw on every frame.
+            if (_camera == null)
+                return;
+
             try
             {
                 var num = 0.02f;
