@@ -30,6 +30,7 @@ namespace PerspectiveCamera
         {
             GameObject cameraHandlerGo = new GameObject(getIdentifier() + " | Camera Handler");
             _cameraHandler = cameraHandlerGo.AddComponent<CameraHandler>();
+            cameraHandlerGo.AddComponent<BehindCameraLabels>();
             
 
             _cameraHandler.OrigCamera = Camera.main.gameObject;
